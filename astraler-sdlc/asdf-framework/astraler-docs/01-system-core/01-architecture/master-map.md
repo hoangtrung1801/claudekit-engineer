@@ -64,17 +64,20 @@ Build a modern, AI-native e-commerce platform that enables small businesses to l
 
 ### 2.2 Technology Stack
 
+> Full details: `01-architecture/tech-stack.md`
+
 | Layer | Technology | Rationale |
 |-------|------------|-----------|
 | **Frontend** | Next.js 14 (App Router) | SSR, RSC, excellent DX |
 | **Mobile** | Flutter | Cross-platform, single codebase |
 | **API** | Node.js + Hono | Lightweight, edge-compatible |
-| **Auth** | Supabase Auth | Built-in, OAuth support |
+| **Auth** | Better Auth | Edge-native, TypeScript-first (ADR-005) |
 | **Database** | PostgreSQL (Supabase) | Relational, RLS, realtime |
 | **Cache** | Redis (Upstash) | Serverless, low latency |
 | **Storage** | Cloudflare R2 | S3-compatible, no egress fees |
 | **Edge** | Cloudflare Workers | Global, low latency |
 | **Payments** | SePay + Stripe | Vietnam + International |
+| **Search** | Meilisearch | Fast, typo-tolerant (planned) |
 
 ### 2.3 Module Dependencies
 
@@ -211,13 +214,15 @@ CLOUDFLARE_R2_SECRET_KEY=
 ---
 
 **Cross-References:**
-- UI/UX: `03-design/ui-ux-design-system.md`
-- Components: `03-design/component-library.md`
+- Tech Stack: `01-architecture/tech-stack.md`
+- Data: `01-architecture/data-architecture.md`
+- Infrastructure: `01-architecture/infrastructure.md`
 - Coding: `02-standards/coding-standards.md`
 - API: `02-standards/api-standards.md`
 - Testing: `02-standards/testing-strategy.md`
 - Performance: `02-standards/performance-slas.md`
+- UI/UX: `03-design/ui-ux-design-system.md`
+- Components: `03-design/component-library.md`
 - Security: `04-governance/security-policy.md`
 - Decisions: `04-governance/decision-log.md`
-- Data: `01-architecture/data-architecture.md`
-- Infrastructure: `01-architecture/infrastructure.md`
+- Glossary: `04-governance/glossary.md`
