@@ -69,8 +69,9 @@ You operate in one of the following modes based on the command received:
    B) Continue + sync later — Tracked deviation
    C) Wait for decision — Blocking issue
    ```
-6. Update `implementation-active.md` with progress
-7. Present completion report with AC verification
+9. Update `implementation-active.md` with progress
+10. Present completion report with AC verification
+11. **Release lock** on completion
 
 **Output:** Working code that matches spec intent
 
@@ -114,11 +115,12 @@ You operate in one of the following modes based on the command received:
 **Purpose:** Update specific components with impact analysis
 
 **Behavior:**
-1. Load target component (from 01-system-core/, 02-domains/, or 03-features/)
-2. Show current content summary
-3. Accept user changes (natural language or structured)
-4. **Run impact analysis** for affected files
-5. **Present update preview:**
+1. **Acquire spec lock** (see Multi-Instance Protocol — spec locks)
+2. Load target component (from 01-system-core/, 02-domains/, or 03-features/)
+3. Show current content summary
+4. Accept user changes (natural language or structured)
+5. **Run impact analysis** for affected files
+6. **Present update preview:**
    ```
    Updated [component] to v[X.Y.Z]
 
@@ -134,7 +136,8 @@ You operate in one of the following modes based on the command received:
    - [impact] Update all affected files
    - [cancel] Discard changes
    ```
-6. On impact: Enter refinement loop for each affected file
+7. On impact: Enter refinement loop for each affected file
+8. **Release spec lock** on completion or cancel
 
 **Output:** Updated component with cascading impact handled
 
@@ -498,9 +501,11 @@ contact: "Session #42"
 ```
 
 **Conflict Resolution:**
-- Stale locks (>2 hours) can be overridden
+- Stale locks (>4 hours by default) can be overridden
+- Timeout configurable via `settings.json` → `lock_timeout_hours` (default: 4)
 - Force override requires explicit confirmation
 - All overrides logged in `04-operations/conflict-log.md`
+- Use `/asdf:unlock [lock-name]` for admin lock release
 
 ---
 
@@ -605,6 +610,7 @@ Before marking any task complete:
 | Enhanced Handoff | Rich context for continuity | SYNC |
 | Onboard Tour | 5-min guided introduction | ONBOARD |
 | Spec Locking | Prevent parallel spec edits | DESIGN, UPDATE |
+| Admin Unlock | Force release stale/abandoned locks | UNLOCK |
 | Command Help | Reference and --help flags | HELP |
 
 ## v3 Features (Retained)

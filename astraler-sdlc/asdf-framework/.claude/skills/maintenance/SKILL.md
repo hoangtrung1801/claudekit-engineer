@@ -143,7 +143,9 @@ git log --since="[spec-date]" --oneline -- [code-path]/
 
 ### Tech Debt Template
 
-Location: `04-operations/tech-debt.md`
+**Reference:** See `references/tech-debt-template.md` for full template.
+
+**Location:** `04-operations/tech-debt.md`
 
 ```markdown
 # Tech Debt Register

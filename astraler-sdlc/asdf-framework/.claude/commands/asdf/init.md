@@ -400,10 +400,156 @@ After user confirms:
 - [P] feature specs
 - [Q] operations files
 
+Proceeding to CLAUDE.md setup...
+```
+
+---
+
+## Step 6: CLAUDE.md Generation (CRITICAL)
+
+After creating astraler-docs/, generate or update CLAUDE.md so Claude Code knows the project uses ASDF.
+
+### 6.1: Check Existing CLAUDE.md
+
+```bash
+# Check if CLAUDE.md exists
+ls CLAUDE.md 2>/dev/null
+```
+
+### 6.2: Scenario A — No CLAUDE.md (Greenfield)
+
+**Condition:** CLAUDE.md does not exist
+
+**Action:** Generate new CLAUDE.md from template
+
+```markdown
+**Generating CLAUDE.md...**
+
+Creating project entry point for Claude Code.
+
+[Generate from spec-governance/references/claude-md-template.md]
+[Populate variables from init conversation and tech-stack.md]
+
+✓ CLAUDE.md created
+
+Contents:
+- Project name: [name]
+- Agent: asdf-coder.md
+- Commands: 17 ASDF commands
+- Tech stack: [summary]
+- Domains: [list]
+- Critical rules: 4 items
+```
+
+### 6.3: Scenario B — CLAUDE.md Exists (Brownfield)
+
+**Condition:** CLAUDE.md exists but no ASDF configuration
+
+**Detection:** Check for ASDF markers:
+```bash
+grep -E "(ASDF|asdf-coder|astraler-docs|/asdf:)" CLAUDE.md
+```
+
+**If no ASDF markers found:**
+
+```markdown
+**CLAUDE.md Merge Preview**
+
+Existing content detected:
+- [Summarize existing sections]
+- Agent: [existing agent or "none"]
+- Commands: [N] existing commands
+- Rules: [M] existing rules
+
+Will add (merged, not replaced):
+- ASDF Framework section
+- Agent reference: `.claude/agents/asdf-coder.md`
+- Commands: 17 ASDF commands (/asdf:*)
+- Documentation reference: `astraler-docs/`
+- ASDF critical rules (4 items)
+- Context loading order
+
+Choose:
+- **[merge]** Apply changes (preserves existing content)
+- **[view]** Show full merged file preview
+- **[skip]** Don't modify CLAUDE.md (manual setup later)
+- **[cancel]** Abort
+```
+
+**On merge:**
+1. Read existing CLAUDE.md content
+2. Identify existing sections (Agent, Commands, Rules, etc.)
+3. Append ASDF sections without replacing existing content
+4. If section exists (e.g., Commands), add ASDF commands to it
+5. Save merged file
+6. Report changes made
+
+**On view:**
+1. Show full merged file content
+2. Return to merge prompt
+
+**On skip:**
+1. Note: "CLAUDE.md not modified. Run `/asdf:init` again to set up later."
+2. Continue to completion
+
+### 6.4: Scenario C — CLAUDE.md Already Has ASDF
+
+**Condition:** CLAUDE.md exists AND has ASDF markers
+
+**Action:**
+
+```markdown
+**CLAUDE.md Already Configured for ASDF**
+
+Detected ASDF configuration in existing CLAUDE.md:
+- Agent: [found reference]
+- Commands: [N] ASDF commands found
+- Documentation: astraler-docs/ referenced
+
+Choose:
+- **[update]** Update to latest ASDF configuration
+- **[skip]** Keep existing CLAUDE.md as-is
+- **[view]** Show current ASDF configuration
+```
+
+**On update:**
+1. Preserve non-ASDF sections
+2. Update ASDF sections to latest template
+3. Report what was updated
+
+### 6.5: CLAUDE.md Template Variables
+
+| Variable | Source |
+|----------|--------|
+| `{{PROJECT_NAME}}` | From init conversation or package.json |
+| `{{TECH_FRONTEND}}` | From generated tech-stack.md |
+| `{{TECH_BACKEND}}` | From generated tech-stack.md |
+| `{{TECH_DATABASE}}` | From generated tech-stack.md |
+| `{{TECH_TESTING}}` | From generated tech-stack.md |
+| `{{DOMAINS_LIST}}` | From 02-domains/ directory scan |
+| `{{INIT_DATE}}` | Current date (YYMMDD) |
+
+### 6.6: Final Completion Report
+
+```markdown
+**ASDF Initialization Complete**
+
+**Structure:**
+- Location: astraler-docs/
+- System-core: [N] files
+- Domains: [M] specs
+- Features: [P] specs
+- Operations: [Q] files
+
+**CLAUDE.md:**
+- Status: [Created | Merged | Updated | Skipped]
+- Agent: asdf-coder.md configured
+
 **Next steps:**
 - Review generated specs for accuracy
 - Run `/asdf:spec [feature]` for new features
 - Run `/asdf:code [path]` when ready to implement
+- Run `/asdf:onboard` to see project overview
 ```
 
 ---
@@ -416,6 +562,7 @@ After user confirms:
 - **Include diagrams** — Mermaid diagrams are mandatory in system-core
 - **Ask, don't assume** — Let user choose their path
 - **Show, then adjust** — Draft first, iterate on feedback
+- **Always handle CLAUDE.md** — Generate, merge, or update after structure creation
 
 ---
 
@@ -433,6 +580,12 @@ After user confirms:
 5. Generate structure based on path chosen
 6. Present for refinement loop
 7. Finalize on confirm
+8. **Generate/update CLAUDE.md** (entry point for Claude Code)
+
+**CLAUDE.md Handling:**
+- **Greenfield:** Generate new CLAUDE.md with full ASDF config
+- **Brownfield:** Merge ASDF config into existing CLAUDE.md
+- **Existing ASDF:** Offer to update to latest config
 
 **Examples:**
 - `/asdf:init` — Start interactive init
