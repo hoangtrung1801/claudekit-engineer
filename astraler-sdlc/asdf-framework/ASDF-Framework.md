@@ -1,10 +1,22 @@
 # ASDF (Astraler Spec-Driven Framework)
 
-> **Version**: 3.0.0
+> **Version**: 4.0.0
 > **Last Updated**: 241224
 > **Status**: Production Ready
 
-### v3.0 Features
+### v4.0 Features (New)
+- **Help System** — `/asdf` shows grouped command reference, all commands have `--help`
+- **Component Update** — `/asdf:update [component]` with impact analysis
+- **Progress Reports** — `/asdf:report [feature|all]` for feature/project health
+- **Spec Audit** — `/asdf:audit` detects outdated/missing/orphaned specs
+- **Cleanup Command** — `/asdf:cleanup` archives unused specs
+- **Onboarding** — `/asdf:onboard` 5-minute guided tour for new devs
+- **Incomplete Detection** — `/asdf:init` scans and resumes partial setups
+- **Enhanced Handoff** — Mental context, decisions, environment state
+- **Spec Locking** — Lock specs during editing (multi-instance)
+- **Test Matrix** — Classify tests by type (Unit/Integration/API/E2E)
+
+### v3.0 Features (Inherited)
 - **Testing Strategy** — AI generates test cases from spec ACs (`/asdf:test`)
 - **PR Protocol** — Structured code review with `/asdf:pr` and `/asdf:review`
 - **Dependency Check** — Block implementation if prerequisites not met
@@ -12,7 +24,7 @@
 - **Roadmap Management** — Phase-based feature planning (`/asdf:roadmap`)
 - **Multi-Instance Support** — Lock mechanism for parallel Claude instances
 
-### v2.1 Features (Inherited)
+### v2.x Features (Inherited)
 - **Iterative Refinement Loop** — Feedback → Reference → Confirm cycle
 - **Duplicate Detection** — Checks existing specs before creation
 - **Reference Collection** — Progressive document gathering
@@ -101,10 +113,13 @@ astraler-docs/
 └── 04-operations/           # Tier 4: Execution state
     ├── implementation-active.md
     ├── session-handoff.md
-    ├── roadmap.md           # v3: Phase-based planning
-    ├── active/              # v3: Per-feature execution files
-    ├── completed/           # v3: Archived completed features
-    ├── locks/               # v3: Multi-instance lock files
+    ├── roadmap.md           # Phase-based planning
+    ├── tech-debt.md         # v4: Tech debt register
+    ├── active/              # Per-feature execution files
+    ├── completed/           # Archived completed features
+    ├── locks/               # Multi-instance lock files
+    ├── spec-locks/          # v4: Spec editing locks
+    ├── archived/            # v4: Archived specs from cleanup
     └── changelog/
 ```
 
@@ -127,14 +142,20 @@ When starting any task, AI loads context in this sequence:
 .claude/
 ├── settings.json
 ├── commands/asdf/
+│   ├── asdf.md              # v4: Main help, command reference
 │   ├── init.md              # Initialize ASDF structure
 │   ├── spec.md              # Create feature specifications
 │   ├── code.md              # Execute implementation from spec
-│   ├── test.md              # v3: Generate tests from spec
+│   ├── test.md              # Generate tests from spec
 │   ├── sync.md              # Trigger Reverse Sync
-│   ├── pr.md                # v3: Create PR package
-│   ├── review.md            # v3: AI code review
-│   ├── roadmap.md           # v3: Manage project phases
+│   ├── update.md            # v4: Update component with impact analysis
+│   ├── report.md            # v4: Progress reports
+│   ├── audit.md             # v4: Spec health audit
+│   ├── cleanup.md           # v4: Remove unused specs
+│   ├── onboard.md           # v4: Guided tour for new devs
+│   ├── pr.md                # Create PR package
+│   ├── review.md            # AI code review
+│   ├── roadmap.md           # Manage project phases
 │   ├── status.md            # Update project status
 │   └── handoff.md           # Create session handoff notes
 ├── skills/
@@ -142,27 +163,56 @@ When starting any task, AI loads context in this sequence:
 │   ├── reverse-sync/        # Code-spec reconciliation
 │   ├── context-loading/     # Hierarchical context loading
 │   ├── refinement-loop/     # Feedback/reference/confirm cycle
-│   ├── impact-analysis/     # v3: Dependency & breaking changes
-│   ├── testing/             # v3: Test generation patterns
-│   └── pr-review/           # v3: PR & review protocols
+│   ├── impact-analysis/     # Dependency & breaking changes
+│   ├── testing/             # Test generation, test matrix
+│   ├── pr-review/           # PR & review protocols
+│   └── maintenance/         # v4: Audit, cleanup, tech debt
 └── agents/
     └── asdf-coder.md        # Single agent with multiple modes
 ```
 
 ### 4.2 Slash Commands
 
+**Help & Discovery:**
 | Command | Purpose | Mode |
 |---------|---------|------|
-| `/asdf:init` | Initialize ASDF structure for new project | DESIGN |
-| `/asdf:spec [feature]` | Brainstorm and create feature specification | DESIGN |
+| `/asdf` | Show all commands grouped by category | HELP |
+| `/asdf:[cmd] --help` | Show help for specific command | HELP |
+
+**Core Workflow:**
+| Command | Purpose | Mode |
+|---------|---------|------|
+| `/asdf:init` | Initialize ASDF structure (with incomplete detection) | DESIGN |
+| `/asdf:spec [feature]` | Create feature specification (with spec locking) | DESIGN |
 | `/asdf:code [path]` | Execute implementation from specification | EXECUTE |
-| `/asdf:test [feature]` | Generate test cases from spec ACs | TEST |
+| `/asdf:test [feature]` | Generate test cases with test matrix | TEST |
 | `/asdf:sync` | Trigger Reverse Sync (Code → Docs) | SYNC |
+
+**Updates & Maintenance:**
+| Command | Purpose | Mode |
+|---------|---------|------|
+| `/asdf:update [component]` | Update component with impact analysis | UPDATE |
+| `/asdf:audit` | Scan for outdated/missing/orphaned specs | AUDIT |
+| `/asdf:cleanup` | Archive/remove unused specs | CLEANUP |
+
+**Reporting:**
+| Command | Purpose | Mode |
+|---------|---------|------|
+| `/asdf:report [feature\|all]` | Generate progress/health reports | REPORT |
+| `/asdf:status` | Update project-level status heartbeat | OPS |
+
+**Collaboration:**
+| Command | Purpose | Mode |
+|---------|---------|------|
+| `/asdf:onboard` | 5-minute guided tour for new devs | ONBOARD |
+| `/asdf:handoff` | Create enhanced session handoff notes | OPS |
+| `/asdf:roadmap` | Manage project phases and priorities | OPS |
+
+**Code Review:**
+| Command | Purpose | Mode |
+|---------|---------|------|
 | `/asdf:pr [feature]` | Create PR package for code review | PR |
 | `/asdf:review [path]` | AI code review from fresh context | REVIEW |
-| `/asdf:roadmap` | Manage project phases and priorities | OPS |
-| `/asdf:status` | Update project-level status heartbeat | OPS |
-| `/asdf:handoff` | Create session handoff notes | OPS |
 
 ### 4.3 Skills
 
@@ -173,8 +223,9 @@ When starting any task, AI loads context in this sequence:
 | `context-loading` | Load hierarchical context properly | v2.0 |
 | `refinement-loop` | Collect references, iterate feedback/refine/confirm | v2.1 |
 | `impact-analysis` | Dependency check + breaking change detection | v3.0 |
-| `testing` | Generate test cases from spec ACs | v3.0 |
+| `testing` | Test matrix, test generation (Unit/Integration/API/E2E) | v4.0 |
 | `pr-review` | PR package creation + AI code review | v3.0 |
+| `maintenance` | Audit, cleanup, tech debt tracking patterns | v4.0 |
 
 ### 4.4 Agent
 
@@ -183,7 +234,13 @@ When starting any task, AI loads context in this sequence:
 | `asdf-coder` | DESIGN | Create/refine specs (brainstorm, structure) |
 | `asdf-coder` | EXECUTE | Implement code from specs (with lock, dependency, impact checks) |
 | `asdf-coder` | SYNC | Validate code-spec alignment, reverse sync |
-| `asdf-coder` | TEST | Generate test suites from spec ACs |
+| `asdf-coder` | TEST | Generate test suites with test matrix |
+| `asdf-coder` | UPDATE | Update components with impact analysis |
+| `asdf-coder` | REPORT | Generate feature/project health reports |
+| `asdf-coder` | AUDIT | Scan for spec health issues |
+| `asdf-coder` | CLEANUP | Archive/remove unused specs |
+| `asdf-coder` | ONBOARD | Guided tour for new developers |
+| `asdf-coder` | HELP | Show command reference and help |
 | `asdf-coder` | PR | Create PR packages for review |
 | `asdf-coder` | REVIEW | AI code review from fresh context |
 | `asdf-coder` | OPS | Roadmap, status, handoff management |
@@ -825,7 +882,6 @@ cp -r asdf-framework/.claude your-project/
 cp asdf-framework/CLAUDE.md your-project/
 
 # 2. Initialize documentation structure
-# (In Claude Code)
 /asdf:init
 
 # 3. Create first feature spec
@@ -833,6 +889,13 @@ cp asdf-framework/CLAUDE.md your-project/
 
 # 4. Implement from spec
 /asdf:code astraler-docs/03-features/YYMMDD-user-authentication/
+```
+
+### For New Team Members
+
+```bash
+# Quick 5-minute orientation
+/asdf:onboard
 ```
 
 ### For Existing Sessions
@@ -849,6 +912,23 @@ cat astraler-docs/04-operations/implementation-active.md
 
 # 4. End session properly
 /asdf:handoff
+```
+
+### For Maintenance
+
+```bash
+# Check spec health
+/asdf:audit
+
+# View project health report
+/asdf:report all
+
+# Cleanup unused specs
+/asdf:cleanup
+
+# Get help on any command
+/asdf
+/asdf:spec --help
 ```
 
 ---
