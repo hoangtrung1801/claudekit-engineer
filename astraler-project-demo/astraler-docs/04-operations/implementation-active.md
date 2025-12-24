@@ -10,7 +10,7 @@
 
 | Feature | Status | Lock | Instance | Progress |
 |---------|--------|------|----------|----------|
-| *No active features* | - | - | - | - |
+| 251224-competitor-tracking | Paused | No | session-251224-1630 | 60% |
 
 ---
 

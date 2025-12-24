@@ -1,6 +1,6 @@
 # Feature: Competitor Tracking
 
-> **Version:** 1.0.0
+> **Version:** 1.0.1
 > **Status:** Draft
 > **Last Updated:** 251224
 > **Feature ID:** 251224-competitor-tracking
@@ -49,6 +49,11 @@ flowchart TD
 | FR-002 | System shall auto-fetch app metadata (name, developer, rating) | Must |
 | FR-003 | System shall allow manual entry of competitor name | Should |
 | FR-004 | System shall auto-discover linked social media channels | Should |
+
+<!-- Original (v1.0.0): FR-004 was planned for MVP Phase 1 -->
+> **Implementation Note (v1.0.1):** Channel discovery deferred to Phase 1.5. Initial implementation returns empty `discoveredChannels` array. Users can manually add channels via FR-008.
+> **Reason:** Requires SearchAPI.io integration and social platform crawlers setup.
+> [Reverse Synced: 251224]
 | FR-005 | System shall display competitor card with key metrics | Must |
 | FR-006 | System shall limit competitors to 10 per project | Must |
 | FR-007 | System shall allow removing competitors | Must |
@@ -275,15 +280,20 @@ interface CompetitorInput {
 
 | Task | Status | Notes |
 |------|--------|-------|
-| URL validation | Not Started | Frontend + Backend |
-| Metadata fetching | Not Started | SearchAPI integration |
-| Competitor CRUD | Not Started | API + Database |
+| URL validation | In Progress | Backend stub created |
+| Metadata fetching | In Progress | Backend stub, needs SearchAPI |
+| Competitor CRUD | In Progress | Backend stub, needs Prisma |
 | UI components | Not Started | Modal, Card |
-| Channel discovery | Not Started | Phase 1.5 maybe |
+| Channel discovery | Deferred | Phase 1.5 |
 
 ---
 
 ## 14. Changelog
+
+### 251224 - v1.0.1 - Reverse Sync
+- FR-004: Channel discovery deferred to Phase 1.5
+- Reason: Requires SearchAPI.io and social crawler setup
+- Implementation progress updated (backend stubs created)
 
 ### 251224 - v1.0.0 - Initial Draft
 - Created feature spec from BRD
