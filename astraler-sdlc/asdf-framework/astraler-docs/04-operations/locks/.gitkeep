@@ -1,0 +1,3 @@
+# Lock files for parallel instance coordination
+# Each file: [feature-name].lock with instance_id, timestamp, task
+# Stale locks (>2 hours) can be overridden

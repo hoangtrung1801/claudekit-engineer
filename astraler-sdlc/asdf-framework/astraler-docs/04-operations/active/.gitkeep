@@ -1,0 +1,3 @@
+# Per-feature execution files
+# Each file tracks a single feature's implementation progress
+# Naming: [feature-name].md (e.g., authentication.md, checkout.md)

@@ -11,6 +11,30 @@ Capture session state for seamless continuation in next session.
 
 ## Workflow
 
+### Step 0: Release Feature Lock
+
+**If a feature is currently locked by this session:**
+
+1. Check `04-operations/locks/` for locks owned by this session
+2. For each lock:
+   - Delete the lock file
+   - Update execution file status in `04-operations/active/[feature].md` to "Paused"
+   - Update `implementation-active.md` Feature Execution Status (remove lock indicator)
+
+```markdown
+**Locks Released:**
+
+| Feature | Previous Status | Now |
+|---------|-----------------|-----|
+| [feature-name] | In Progress | Paused (Available) |
+
+Next session can continue with: `/asdf:code [feature]`
+```
+
+---
+
+### Step 1: Gather Session Context
+
 1. **Gather session context:**
    - What was the goal this session?
    - What was accomplished?
@@ -18,7 +42,7 @@ Capture session state for seamless continuation in next session.
    - What blockers were encountered?
    - What decisions were made?
 
-2. **Update implementation-active.md:**
+### Step 2: Update implementation-active.md
    ```markdown
    # Implementation Active
 

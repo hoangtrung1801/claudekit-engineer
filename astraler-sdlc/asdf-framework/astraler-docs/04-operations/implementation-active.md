@@ -5,6 +5,18 @@
 
 ---
 
+## Feature Execution Status
+
+| Feature | Execution File | Lock | Status |
+|---------|----------------|------|--------|
+| push-notifications | `active/push-notifications.md` | None | Blocked |
+| checkout-flow | `active/checkout-flow.md` | None | In Progress |
+
+> **Note:** Per-feature execution files track individual implementation progress.
+> Lock files in `locks/` prevent parallel conflicts.
+
+---
+
 ## Current Task
 
 | Field | Value |
