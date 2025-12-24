@@ -16,6 +16,7 @@ Refresh the project heartbeat at `astraler-docs/01-system-core/project-status.md
    - Count features by status in `astraler-docs/03-features/`
    - Check recent changelog entries
    - Identify blockers
+   - **Check `04-operations/locks/` for active locks**
 
 2. **Update project-status.md:**
 
@@ -30,11 +31,20 @@ Refresh the project heartbeat at `astraler-docs/01-system-core/project-status.md
    - [Current task from implementation-active.md]
    - Progress: [X]%
 
+   ## Feature Locks
+
+   | Feature | Locked By | Since | Task |
+   |---------|-----------|-------|------|
+   | [feature] | [instance] | [timestamp] | [task] |
+
+   > No locks = "No active locks. Features available for work."
+
    ## Feature Summary
    | Status | Count |
    |--------|-------|
    | Planned | X |
    | In Progress | X |
+   | Blocked | X |
    | Implemented | X |
 
    ## Recent Changes

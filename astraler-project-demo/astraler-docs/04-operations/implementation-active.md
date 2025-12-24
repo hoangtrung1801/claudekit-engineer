@@ -6,6 +6,14 @@
 
 ---
 
+## Feature Execution Status
+
+| Feature | Status | Lock | Instance | Progress |
+|---------|--------|------|----------|----------|
+| *No active features* | - | - | - | - |
+
+---
+
 ## 1. Current Focus
 
 ### Active Work

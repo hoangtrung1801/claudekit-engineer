@@ -236,7 +236,42 @@ interface CompetitorInput {
 
 ---
 
-## 12. Implementation Progress
+## 12. Testing
+
+### Unit Tests
+
+| Test ID | Description | Input | Expected Output |
+|---------|-------------|-------|-----------------|
+| UT-001 | Valid iOS URL pattern | `apps.apple.com/app/id123` | Returns bundleId `123` |
+| UT-002 | Valid Play Store URL | `play.google.com/store/apps/details?id=com.app` | Returns bundleId `com.app` |
+| UT-003 | Invalid URL rejection | `invalid.com` | Throws ValidationError |
+| UT-004 | Empty URL rejection | `""` | Throws ValidationError |
+
+### Integration Tests
+
+| Test ID | Description | Preconditions | Steps | Expected Result |
+|---------|-------------|---------------|-------|-----------------|
+| IT-001 | POST valid iOS competitor | Auth user, project exists | POST `/projects/:id/competitors` with iOS URL | 201, competitor created |
+| IT-002 | POST valid Android competitor | Auth user, project exists | POST with Play Store URL | 201, competitor created |
+| IT-003 | POST invalid URL | Auth user, project exists | POST with `invalid.com` | 400, "Invalid app store URL" |
+| IT-004 | POST max competitors exceeded | Project has 10 competitors | POST 11th competitor | 400, "Maximum competitors reached" |
+| IT-005 | DELETE competitor | Competitor exists | DELETE `/projects/:id/competitors/:cid` | 200, soft deleted |
+
+### Edge Cases
+
+| Case | Description | How to Handle |
+|------|-------------|---------------|
+| EC-001 | URL with query params | Strip params, extract ID only |
+| EC-002 | Uppercase URL | Normalize to lowercase |
+| EC-003 | Network timeout | Retry 2x, then fail gracefully |
+| EC-004 | App not found in store | Return 404 with helpful message |
+
+**Test Coverage Target:** 80%
+**Generated:** 251224
+
+---
+
+## 13. Implementation Progress
 
 | Task | Status | Notes |
 |------|--------|-------|
@@ -248,7 +283,7 @@ interface CompetitorInput {
 
 ---
 
-## 13. Changelog
+## 14. Changelog
 
 ### 251224 - v1.0.0 - Initial Draft
 - Created feature spec from BRD
