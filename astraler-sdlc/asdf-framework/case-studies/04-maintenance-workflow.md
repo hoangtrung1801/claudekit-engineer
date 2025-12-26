@@ -18,7 +18,8 @@ flowchart LR
     end
 
     subgraph Commands["Maintenance Commands"]
-        E["/asdf:audit"]
+        E["/asdf:guardian"]
+        E1["/asdf:audit"]
         F["/asdf:sync"]
         G["/asdf:cleanup"]
         H["Tech Debt Review"]
@@ -36,9 +37,63 @@ flowchart LR
 
 ---
 
-## Initial State: Project Health Check
+## Initial State: Pipeline Overview
 
-### Step 1: Run `/asdf:report all`
+### Step 1: Run `/asdf:guardian` First
+
+Start with the pipeline supervisor to get a high-level view:
+
+```
+You: /asdf:guardian
+```
+
+**AI Response:**
+```
+ASDF GUARDIAN — Pipeline Status
+═══════════════════════════════════════════════════════════════════════
+
+Health Score: 45% 🔴 Critical
+Active Features: 8 | Stale: 5 | Blocked: 1
+
+PIPELINE VIEW
+─────────────────────────────────────────────────────────────────────────
+Stage      │ Feature                    │ Age    │ Status
+─────────────────────────────────────────────────────────────────────────
+SPEC       │ 251230-wishlist            │ 2d     │ ✓ Planning
+           │ 251215-loyalty-points      │ 12d    │ 💤 Dormant
+─────────────────────────────────────────────────────────────────────────
+CODE       │ 251225-analytics           │ 30d    │ ⚠️ Slow
+─────────────────────────────────────────────────────────────────────────
+PR_LOCAL   │ 251220-checkout            │ 60d    │ ⚠️ Stale (not pushed)
+           │ 251221-user-profile        │ 45d    │ ⚠️ Stale (not pushed)
+─────────────────────────────────────────────────────────────────────────
+CI         │ 251218-inventory           │ 5d     │ 🔴 Blocked (CI failing)
+─────────────────────────────────────────────────────────────────────────
+MERGED     │ 251210-shopping-cart       │ —      │ ✓ Complete
+           │ 251205-product-listing     │ —      │ ✓ Complete
+═══════════════════════════════════════════════════════════════════════
+
+ALERTS (5)
+─────────────────────────────────────────────────────────────────────────
+💤 251215-loyalty-points  │ Dormant 12 days      │ Start or archive
+⚠️  251225-analytics       │ Coding 30 days       │ Check blockers
+⚠️  251220-checkout        │ PR not pushed 60d    │ /asdf:pr --push
+⚠️  251221-user-profile    │ PR not pushed 45d    │ /asdf:pr --push
+🔴 251218-inventory       │ CI failing 5 days    │ Fix failing tests
+─────────────────────────────────────────────────────────────────────────
+
+RECOMMENDATIONS
+─────────────────────────────────────────────────────────────────────────
+1. Fix CI: 251218-inventory — blocking the pipeline
+2. Push stale PRs: checkout, user-profile
+3. Run /asdf:audit for spec-level issues
+4. Archive or start: 251215-loyalty-points
+─────────────────────────────────────────────────────────────────────────
+```
+
+Guardian shows pipeline-level issues. Now dig deeper with audit.
+
+### Step 2: Run `/asdf:report all` for Details
 
 ```
 You: /asdf:report all
@@ -507,11 +562,18 @@ Overall: 🟢 HEALTHY
 
 | Task | Frequency | Command |
 |------|-----------|---------|
+| Pipeline scan | Weekly | `/asdf:guardian` |
 | Health check | Weekly | `/asdf:report all` |
 | Spec audit | Weekly | `/asdf:audit` |
 | Tech debt review | Bi-weekly | Review tech-debt.md |
 | Full cleanup | Monthly | `/asdf:cleanup` |
 | Orphan check | Monthly | Part of audit |
+
+### Weekly Maintenance Workflow
+
+```
+/asdf:guardian → /asdf:report all → /asdf:audit → fix issues → /asdf:cleanup
+```
 
 ---
 
@@ -552,8 +614,10 @@ flowchart TB
 
 | Command | Purpose | When to Use |
 |---------|---------|-------------|
+| `/asdf:guardian` | Pipeline overview, stale detection | Weekly (start here) |
 | `/asdf:report all` | Project health dashboard | Weekly check |
 | `/asdf:audit` | Detailed spec health analysis | Weekly or after sprints |
 | `/asdf:sync` | Update specs from code | After implementations |
 | `/asdf:cleanup` | Remove orphaned specs | Monthly or after migrations |
+| `/asdf:version` | Check toolkit version | When upgrading |
 | Tech debt review | Prioritize and fix debt | Bi-weekly |

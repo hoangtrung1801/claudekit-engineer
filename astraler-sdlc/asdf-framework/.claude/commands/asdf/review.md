@@ -16,6 +16,73 @@ argument-hint: [pr-package-path]
 
 ---
 
+## Step 0: Check PR Status
+
+### 0.1: Detect Local Package
+
+1. Check if `$ARGUMENTS` exists locally
+2. Extract feature name from path (e.g., `.pr-review/251226-auth/` → `251226-auth`)
+
+**If local package not found:**
+```markdown
+**PR Package Not Found**
+
+Cannot find PR package at "$ARGUMENTS".
+
+Options:
+- Create package first: `/asdf:pr [feature-name]`
+- Check path spelling
+```
+
+### 0.2: Check Remote PR Status
+
+**Run:** `gh pr list --head [branch-name] --json number,state,url`
+
+**Possible states:**
+
+| Local Package | Remote PR | Action |
+|---------------|-----------|--------|
+| Exists | Exists (OPEN) | Proceed with review + post comment |
+| Exists | Exists (MERGED) | Warn: PR already merged |
+| Exists | Not Found | Warn: PR not pushed yet |
+| Not Found | - | Error: Create package first |
+
+**If PR not pushed:**
+```markdown
+**⚠️ WARNING: PR Not Pushed to Remote**
+
+Local package exists at: $ARGUMENTS
+But no PR found on GitHub for this branch.
+
+The review will be LOCAL ONLY. To post to GitHub:
+
+1. Push changes: `git push -u origin [branch]`
+2. Create PR: `gh pr create`
+   Or use: `/asdf:pr [feature] --push`
+3. Re-run review: `/asdf:review $ARGUMENTS`
+
+Options:
+- **[continue]** Review locally (no GitHub comment)
+- **[abort]** Stop and push PR first
+
+What would you like to do?
+```
+
+**If PR exists on remote:**
+```markdown
+**Remote PR Detected**
+
+PR #[number]: [title]
+URL: [url]
+Status: [OPEN | DRAFT]
+
+Review will be posted as comment to this PR.
+
+Proceeding with review...
+```
+
+---
+
 ## CRITICAL: Fresh Context Requirement
 
 **This review MUST be performed with fresh perspective.**
@@ -245,6 +312,48 @@ Question requiring decision:
 
 ---
 
+### Step 8: Post Review to GitHub (if remote PR exists)
+
+**If remote PR was detected in Step 0:**
+
+1. Format review as GitHub comment (markdown)
+2. Post using: `gh pr comment [PR-number] --body "[review-content]"`
+3. If verdict is APPROVE: `gh pr review [PR-number] --approve --body "AI Review: APPROVED"`
+4. If verdict is REQUEST_CHANGES: `gh pr review [PR-number] --request-changes --body "AI Review: Changes requested"`
+
+```markdown
+**Review Posted to GitHub**
+
+PR #[number]: [url]
+Verdict: [APPROVE | REQUEST_CHANGES | NEEDS_DISCUSSION]
+Comment: Posted ✓
+
+**Next Steps:**
+[If APPROVE]
+- Ready to merge: `/asdf:merge [feature]`
+
+[If REQUEST_CHANGES]
+- Fix issues listed above
+- Re-run review after fixes
+
+[If NEEDS_DISCUSSION]
+- Discuss on PR thread
+- Re-run review after resolution
+```
+
+**If local-only review (no remote PR):**
+```markdown
+**Review Complete (Local Only)**
+
+Review saved locally. Not posted to GitHub.
+
+To post to GitHub:
+1. Push and create PR: `/asdf:pr [feature] --push`
+2. Re-run review: `/asdf:review $ARGUMENTS`
+```
+
+---
+
 ## Rules
 
 | Rule | Description |
@@ -255,3 +364,4 @@ Question requiring decision:
 | Verdict Required | MUST choose APPROVE / REQUEST_CHANGES / NEEDS_DISCUSSION |
 | Balanced | Note positives, not just problems |
 | Traceable | Reference specific code locations |
+| Auto-Post | Post review to GitHub PR if remote exists |

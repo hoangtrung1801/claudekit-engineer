@@ -15,8 +15,11 @@ stateDiagram-v2
     HELP --> SYNC: /asdf:sync
     HELP --> TEST: /asdf:test
     HELP --> REVIEW: /asdf:pr, /asdf:review
+    HELP --> MERGE: /asdf:merge
+    HELP --> GUARDIAN: /asdf:guardian
     HELP --> REPORT: /asdf:report, /asdf:audit
     HELP --> MAINTENANCE: /asdf:cleanup, /asdf:onboard
+    HELP --> CONFIG: /asdf:config, /asdf:version
     HELP --> SESSION: /asdf:handoff, /asdf:unlock
 
     DESIGN --> EXECUTE: Spec approved
@@ -24,8 +27,12 @@ stateDiagram-v2
     EXECUTE --> SYNC: Deviation detected
     TEST --> REVIEW: Tests passing
     REVIEW --> SYNC: Review complete
+    REVIEW --> MERGE: Approved
+    MERGE --> DESIGN: Feature done
     SYNC --> DESIGN: Spec updated
 
+    GUARDIAN --> REPORT: Drill down
+    GUARDIAN --> MAINTENANCE: Stale items
     REPORT --> MAINTENANCE: Issues found
     MAINTENANCE --> DESIGN: Cleanup done
 
@@ -136,16 +143,87 @@ flowchart LR
 ```mermaid
 flowchart LR
     A[Bundle Changes] --> B[Generate PR Summary]
-    B --> C[AI Review]
-    C --> D{Issues?}
-    D -->|Yes| E[Apply Fixes]
-    D -->|No| F[Approved]
-    E --> C
+    B --> C[Push to GitHub]
+    C --> D[AI Review]
+    D --> E{Issues?}
+    E -->|Yes| F[Apply Fixes]
+    E -->|No| G[Approved]
+    F --> D
+    G --> H[Ready to Merge]
 ```
 
 **Transitions:**
+- → MERGE: After PR approved
 - → SYNC: After review complete
 - → EXECUTE: If fixes needed
+
+---
+
+### MERGE MODE
+**Commands:** `/asdf:merge`
+
+**Purpose:** Merge approved PRs with automatic cleanup
+
+**Flow:**
+```mermaid
+flowchart LR
+    A[Find PR] --> B[Check Approval]
+    B --> C[Check CI]
+    C --> D{All Pass?}
+    D -->|Yes| E[Execute Merge]
+    D -->|No| F[Block]
+    E --> G[Cleanup]
+    G --> H[Done]
+```
+
+**Transitions:**
+- → DESIGN: Feature complete, start next
+- → EXECUTE: If fixes needed before merge
+
+---
+
+### GUARDIAN MODE
+**Commands:** `/asdf:guardian`
+
+**Purpose:** Full pipeline scan with health monitoring
+
+**Flow:**
+```mermaid
+flowchart LR
+    A[Scan Features] --> B[Determine Stages]
+    B --> C[Check Stale]
+    C --> D[Calculate Health]
+    D --> E[Generate Report]
+    E --> F[Recommendations]
+```
+
+**Transitions:**
+- → REPORT: Drill down for details
+- → MAINTENANCE: Address stale items
+- → MERGE: Ready-to-merge items found
+
+---
+
+### CONFIG MODE
+**Commands:** `/asdf:config`, `/asdf:version`
+
+**Purpose:** View/edit settings and toolkit version
+
+**Flow:**
+```mermaid
+flowchart LR
+    subgraph Config
+        A1[View Settings] --> B1{Change?}
+        B1 -->|Yes| C1[Update]
+        B1 -->|No| D1[Done]
+    end
+    subgraph Version
+        A2[Display Version] --> B2[Show Changelog]
+    end
+```
+
+**Transitions:**
+- → Any Mode: After configuration
 
 ---
 
@@ -218,24 +296,34 @@ flowchart LR
 
 ## Typical Mode Sequences
 
-### Feature Development
+### Feature Development (Full Cycle)
 ```
-DESIGN → EXECUTE → TEST → REVIEW → SYNC → DONE
+DESIGN → EXECUTE → TEST → REVIEW → SYNC → MERGE → DONE
+```
+
+### Quick Feature
+```
+DESIGN → EXECUTE → TEST → REVIEW(--push) → MERGE
 ```
 
 ### Maintenance Sprint
 ```
-REPORT → MAINTENANCE → SYNC → REPORT
+GUARDIAN → REPORT → MAINTENANCE → SYNC → GUARDIAN
+```
+
+### Weekly Health Check
+```
+GUARDIAN → REPORT → AUDIT → CLEANUP
 ```
 
 ### Bug Fix
 ```
-EXECUTE → TEST → SYNC
+EXECUTE → TEST → REVIEW(--push) → MERGE
 ```
 
 ### Team Handoff
 ```
-SESSION(handoff) → ... → SESSION(onboard) → EXECUTE
+SESSION(handoff) → ... → SESSION(onboard) → GUARDIAN → EXECUTE
 ```
 
 ---
@@ -248,7 +336,10 @@ SESSION(handoff) → ... → SESSION(onboard) → EXECUTE
 | EXECUTE | TEST, SYNC, EXECUTE (loop) |
 | SYNC | DESIGN, EXECUTE |
 | TEST | REVIEW, EXECUTE |
-| REVIEW | SYNC, EXECUTE |
+| REVIEW | MERGE, SYNC, EXECUTE |
+| MERGE | DESIGN, GUARDIAN |
+| GUARDIAN | REPORT, MAINTENANCE, MERGE |
 | REPORT | MAINTENANCE, Any |
 | MAINTENANCE | DESIGN, EXECUTE |
+| CONFIG | Any |
 | SESSION | Any, End |

@@ -28,21 +28,28 @@ flowchart TD
     Q6 -->|Yes| Test["/asdf:test [feature]"]
     Q6 -->|No| Q7{Ready for review?}
 
-    Q7 -->|Yes| PR["/asdf:pr [feature]"]
-    Q7 -->|No| Q8{Check project health?}
+    Q7 -->|Yes| PR["/asdf:pr [feature] --push"]
+    Q7 -->|No| Q8{PR approved?}
 
-    Q8 -->|Yes| Q8a{What kind?}
-    Q8a -->|Status| Report["/asdf:report"]
-    Q8a -->|Issues| Audit["/asdf:audit"]
-    Q8a -->|Cleanup| Cleanup["/asdf:cleanup"]
+    Q8 -->|Yes| Merge["/asdf:merge [feature]"]
+    Q8 -->|No| Q9{Check project health?}
 
-    Q8 -->|No| Q9{End of session?}
+    Q9 -->|Yes| Q9a{What kind?}
+    Q9a -->|Pipeline| Guardian["/asdf:guardian"]
+    Q9a -->|Status| Report["/asdf:report"]
+    Q9a -->|Issues| Audit["/asdf:audit"]
+    Q9a -->|Cleanup| Cleanup["/asdf:cleanup"]
 
-    Q9 -->|Yes| Handoff["/asdf:handoff"]
-    Q9 -->|No| Q10{New to project?}
+    Q9 -->|No| Q10{End of session?}
 
-    Q10 -->|Yes| Onboard["/asdf:onboard"]
-    Q10 -->|No| Help["/asdf --help"]
+    Q10 -->|Yes| Handoff["/asdf:handoff"]
+    Q10 -->|No| Q11{New to project?}
+
+    Q11 -->|Yes| Onboard["/asdf:onboard"]
+    Q11 -->|No| Q12{Change settings?}
+
+    Q12 -->|Yes| Config["/asdf:config"]
+    Q12 -->|No| Help["/asdf --help"]
 ```
 
 ---
@@ -60,14 +67,18 @@ flowchart TD
 | Generating tests | `/asdf:test [feature]` |
 | Code changed, spec outdated | `/asdf:sync` |
 | Updating documentation | `/asdf:update [component]` |
-| Creating pull request | `/asdf:pr [feature]` |
+| Creating pull request | `/asdf:pr [feature] --push` |
 | Getting code reviewed | `/asdf:review [path]` |
+| Merging approved PR | `/asdf:merge [feature]` |
+| Full pipeline scan | `/asdf:guardian` |
 | Checking project status | `/asdf:report [feature\|all]` |
 | Finding spec issues | `/asdf:audit` |
 | Removing unused specs | `/asdf:cleanup` |
 | Ending work session | `/asdf:handoff` |
 | Starting work session | `/asdf:onboard` |
 | Lock stuck | `/asdf:unlock [name]` |
+| Change settings | `/asdf:config [key] [value]` |
+| Check toolkit version | `/asdf:version` |
 | Need help | `/asdf` |
 
 ---
@@ -87,22 +98,26 @@ flowchart LR
         E["/asdf:test"]
     end
 
-    subgraph Review["Reviewing"]
-        F["/asdf:pr"]
+    subgraph Review["Review & Merge"]
+        F["/asdf:pr --push"]
         G["/asdf:review"]
-        H["/asdf:sync"]
+        H["/asdf:merge"]
+        I["/asdf:sync"]
     end
 
     subgraph Maintain["Maintaining"]
-        I["/asdf:report"]
-        J["/asdf:audit"]
-        K["/asdf:cleanup"]
+        J["/asdf:guardian"]
+        J1["/asdf:report"]
+        K["/asdf:audit"]
+        L["/asdf:cleanup"]
     end
 
-    subgraph Session["Session"]
-        L["/asdf:onboard"]
-        M["/asdf:handoff"]
-        N["/asdf:unlock"]
+    subgraph Session["Session & Config"]
+        M["/asdf:onboard"]
+        N["/asdf:handoff"]
+        O["/asdf:unlock"]
+        P["/asdf:config"]
+        Q["/asdf:version"]
     end
 
     Plan --> Build --> Review --> Maintain
@@ -124,53 +139,76 @@ flowchart LR
 ### Implementation
 | Command | Purpose |
 |---------|---------|
-| `/asdf:code [spec]` | Implement from specification |
+| `/asdf:code [spec]` | Implement from spec (auto-creates branch) |
 | `/asdf:test [feature]` | Generate test suites |
 | `/asdf:sync` | Sync spec with code changes |
 
-### Review
+### Review & Merge
 | Command | Purpose |
 |---------|---------|
-| `/asdf:pr [feature]` | Create PR package |
-| `/asdf:review [path]` | AI code review |
+| `/asdf:pr [feature]` | Create PR package (add `--push` to create GitHub PR) |
+| `/asdf:review [path]` | AI code review (auto-posts to GitHub PR) |
+| `/asdf:merge [feature]` | Merge approved PR with cleanup |
 
 ### Project Management
 | Command | Purpose |
 |---------|---------|
+| `/asdf:guardian` | Full pipeline scan with health score |
 | `/asdf:report [target]` | Progress reports |
 | `/asdf:audit` | Spec health check |
 | `/asdf:cleanup` | Remove unused specs |
 | `/asdf:roadmap` | Phase management |
 | `/asdf:status` | Project heartbeat |
 
-### Session
+### Session & Config
 | Command | Purpose |
 |---------|---------|
 | `/asdf:onboard` | Quick project tour |
 | `/asdf:handoff` | Session notes |
 | `/asdf:unlock [name]` | Release stuck locks |
+| `/asdf:config` | View/edit Git and lock settings |
+| `/asdf:version` | Show toolkit version and changelog |
 
 ---
 
 ## Common Workflows
 
-### New Feature (Full Cycle)
+### New Feature (Full Cycle with Git)
 ```
-/asdf:spec → /asdf:code → /asdf:test → /asdf:pr → /asdf:review → /asdf:sync
+/asdf:spec → /asdf:code → /asdf:test → /asdf:pr --push → /asdf:review → /asdf:sync → /asdf:merge
 ```
 
 ### Quick Bug Fix
 ```
-/asdf:code → /asdf:test → /asdf:sync
+/asdf:code → /asdf:test → /asdf:pr --push → /asdf:merge
 ```
 
 ### Weekly Maintenance
 ```
-/asdf:report all → /asdf:audit → /asdf:cleanup
+/asdf:guardian → /asdf:report all → /asdf:audit → /asdf:cleanup
+```
+
+### Pipeline Oversight
+```
+/asdf:guardian                    # Full pipeline scan
+/asdf:guardian --stale            # Show stale/blocked only
+/asdf:guardian --stage PR_PUSHED  # Filter by stage
 ```
 
 ### Daily Start/End
 ```
 Start: /asdf:onboard
 End: /asdf:handoff
+```
+
+### Git PR Workflow
+```
+/asdf:pr --push → /asdf:review → /asdf:merge
+```
+
+### Configure Settings
+```
+/asdf:config                              # View all settings
+/asdf:config git.merge_strategy merge     # Change merge strategy
+/asdf:config --reset                      # Reset to defaults
 ```

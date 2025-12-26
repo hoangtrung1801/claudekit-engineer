@@ -58,7 +58,61 @@ What would you like to do?
    ```
 2. Create execution file: `04-operations/active/[feature-name].md`
 3. Update `implementation-active.md` Feature Execution Status table
-4. Proceed to Step 1
+4. Proceed to Step 0.5
+
+---
+
+### Step 0.5: Ensure Feature Branch
+
+**Check current branch:**
+```bash
+git branch --show-current
+```
+
+**Get default branch from settings:**
+- Check `04-operations/settings.yaml` → `git.default_branch`
+- Default: `main`
+
+**If on main/default branch:**
+```markdown
+**⚠️ WARNING: On Main Branch**
+
+You are on the main branch. Implementing directly on main is dangerous.
+
+Recommended: Create a feature branch first.
+
+Branch name suggestion: `feature/[feature-name]`
+
+Options:
+- **[create]** Create branch and switch: `git checkout -b feature/[feature-name]`
+- **[continue]** Continue on main anyway (not recommended)
+- **[abort]** Stop and create branch manually
+
+What would you like to do?
+```
+
+**If [create] selected:**
+```bash
+git checkout -b feature/[feature-name]
+```
+
+```markdown
+**Branch Created**
+
+New branch: `feature/[feature-name]`
+Based on: `main`
+
+Proceeding to implementation...
+```
+
+**If already on feature branch:**
+```markdown
+**Branch Check Passed**
+
+Current branch: `[branch-name]`
+
+Proceeding to implementation...
+```
 
 ---
 

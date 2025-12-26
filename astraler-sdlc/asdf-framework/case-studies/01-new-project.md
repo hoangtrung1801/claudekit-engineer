@@ -564,3 +564,15 @@ Saved to: astraler-docs/04-operations/session-handoff.md
 4. **Deviation handling** — Option A kept spec and code aligned
 5. **Test matrix** — Skipping E2E for non-critical features saves time
 6. **Handoff** — Mental context helps next developer continue smoothly
+
+---
+
+## Next Steps After First Feature
+
+| Task | Command | Purpose |
+|------|---------|---------|
+| Add more features | `/asdf:spec [name]` | Continue building |
+| Monitor pipeline | `/asdf:guardian` | Track feature progress |
+| Create PR | `/asdf:pr [feature] --push` | Push to GitHub |
+| Weekly check | `/asdf:report all` | Project health |
+| Check version | `/asdf:version` | Toolkit info |

@@ -520,4 +520,6 @@ taskflow/
 2. **Bug fixes** — Check spec, fix code, `/asdf:sync` if needed
 3. **Refactoring** — Update spec first, then refactor
 4. **Code reviews** — Reference specs in PR reviews
-5. **Weekly audit** — Run `/asdf:audit` to catch drift
+5. **Weekly maintenance** — Run `/asdf:guardian` then `/asdf:audit` to catch drift
+6. **Monitor pipeline** — Use `/asdf:guardian` to track all features across stages
+7. **Git workflow** — Use `/asdf:pr --push` and `/asdf:merge` for GitHub integration

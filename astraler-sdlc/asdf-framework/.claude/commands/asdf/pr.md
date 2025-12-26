@@ -1,11 +1,14 @@
 ---
 description: Create PR package for feature review
-argument-hint: [feature-name]
+argument-hint: [feature-name] [--push]
 ---
 
 # Create PR Package
 
 **Feature:** $ARGUMENTS
+
+**Flags:**
+- `--push` — Automatically push to GitHub and create PR after package creation
 
 ---
 
@@ -114,6 +117,82 @@ Package: `.pr-review/YYMMDD-$ARGUMENTS/`
 3. Or share for human review
 
 **Reminder:** If deviations exist, run `/asdf:sync $ARGUMENTS` first.
+```
+
+---
+
+### Step 5: Push to Remote (if `--push` flag or prompt)
+
+**Check current branch:**
+```bash
+git branch --show-current
+```
+
+**If on main branch:**
+```markdown
+**⚠️ WARNING: On Main Branch**
+
+You are on the main branch. Creating a PR requires a feature branch.
+
+Options:
+- **[create]** Create branch `feature/[feature-name]` and push
+- **[abort]** Stop and create branch manually
+
+What would you like to do?
+```
+
+**If on feature branch:**
+
+1. **Check remote status:**
+   ```bash
+   git status  # Check for uncommitted changes
+   git log origin/[branch]..HEAD  # Check unpushed commits
+   ```
+
+2. **Push branch (if unpushed commits):**
+   ```bash
+   git push -u origin [branch]
+   ```
+
+3. **Create PR on GitHub:**
+   ```bash
+   gh pr create \
+     --title "[Feature] $ARGUMENTS" \
+     --body-file .pr-review/YYMMDD-$ARGUMENTS/summary.md \
+     --base main
+   ```
+
+**Present result:**
+```markdown
+**PR Created on GitHub**
+
+Branch: [branch-name]
+PR #[number]: [url]
+Base: main
+
+**Package:** `.pr-review/YYMMDD-$ARGUMENTS/`
+
+**Next Steps:**
+1. AI review: `/asdf:review .pr-review/YYMMDD-$ARGUMENTS/`
+2. Wait for CI checks
+3. After approval: `/asdf:merge $ARGUMENTS`
+```
+
+**If `--push` not specified:**
+```markdown
+**PR Package Ready (Local Only)**
+
+Package created at: `.pr-review/YYMMDD-$ARGUMENTS/`
+
+**To push to GitHub:**
+- Run: `/asdf:pr $ARGUMENTS --push`
+- Or manually:
+  1. `git push -u origin [branch]`
+  2. `gh pr create --body-file .pr-review/YYMMDD-$ARGUMENTS/summary.md`
+
+**Next Steps:**
+1. Review locally: `cat .pr-review/YYMMDD-$ARGUMENTS/summary.md`
+2. AI review: `/asdf:review .pr-review/YYMMDD-$ARGUMENTS/`
 ```
 
 ---

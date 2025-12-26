@@ -1,0 +1,58 @@
+# ASDF Settings Template
+# ----------------------
+# This template is used by /asdf:init and /asdf:config to create
+# the project's settings file at: 04-operations/settings.yaml
+#
+# Copy this file to your project and customize as needed.
+
+# ASDF Framework Version
+asdf:
+  version: "4.2"
+
+# Git Integration Settings
+git:
+  # Git hosting provider
+  # Options: github, gitlab, bitbucket
+  # Default: github
+  provider: github
+
+  # Default branch name for merges
+  # Default: main
+  default_branch: main
+
+  # PR merge strategy
+  # Options: squash, merge, rebase
+  # - squash: Combine all commits into one (clean history)
+  # - merge: Create merge commit (preserves all commits)
+  # - rebase: Rebase commits onto base (linear history)
+  # Default: squash
+  merge_strategy: squash
+
+  # Automatically delete branch after PR merge
+  # Default: true
+  auto_delete_branch: true
+
+  # Automatically post AI review comments to GitHub PR
+  # If false, reviews are local only
+  # Default: true
+  auto_post_review: true
+
+# Lock Settings (Multi-Instance Support)
+locks:
+  # Hours before a lock is considered stale
+  # Stale locks can be overridden without force
+  # Range: 1-24
+  # Default: 4
+  timeout_hours: 4
+
+  # Log lock conflicts to 04-operations/conflict-log.md
+  # Default: true
+  conflict_log: true
+
+# ---
+# Usage:
+#
+# View settings:     /asdf:config
+# Change setting:    /asdf:config git.merge_strategy merge
+# Reset to defaults: /asdf:config --reset
+# List all options:  /asdf:config --list

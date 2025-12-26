@@ -2,7 +2,7 @@
 
 **Scenario:** Complete lifecycle of "Guest Checkout" feature from idea to production.
 
-**Goal:** Demonstrate end-to-end ASDF workflow through all 5 phases of feature development.
+**Goal:** Demonstrate end-to-end ASDF workflow through all 6 phases of feature development.
 
 ---
 
@@ -16,26 +16,32 @@ flowchart LR
     end
 
     subgraph Phase2["Phase 2: Implement"]
-        D["/asdf:code"] --> E["Deviation B"]
-        E --> F["Code Complete"]
+        D["Create Branch"] --> E["/asdf:code"]
+        E --> F["Deviation B"]
+        F --> G["Code Complete"]
     end
 
     subgraph Phase3["Phase 3: Test"]
-        G["/asdf:test"] --> H["18 Tests"]
-        H --> I["All Pass"]
+        H["/asdf:test"] --> I["21 Tests"]
+        I --> J["All Pass"]
     end
 
     subgraph Phase4["Phase 4: Review"]
-        J["/asdf:pr"] --> K["/asdf:review"]
-        K --> L["Fixes Applied"]
+        K["/asdf:pr --push"] --> L["PR on GitHub"]
+        L --> M["/asdf:review"]
+        M --> N["Posted to PR"]
     end
 
-    subgraph Phase5["Phase 5: Complete"]
-        M["/asdf:sync"] --> N["/asdf:report"]
-        N --> O["Feature Done ✓"]
+    subgraph Phase5["Phase 5: Sync"]
+        O["/asdf:sync"] --> P["Spec v1.3.0"]
     end
 
-    Phase1 --> Phase2 --> Phase3 --> Phase4 --> Phase5
+    subgraph Phase6["Phase 6: Merge"]
+        Q["/asdf:merge"] --> R["Cleanup"]
+        R --> S["Feature Done ✓"]
+    end
+
+    Phase1 --> Phase2 --> Phase3 --> Phase4 --> Phase5 --> Phase6
 ```
 
 ---
@@ -247,6 +253,33 @@ No breaking changes. Proceeding.
 
 Acquiring lock...
 ✓ Lock acquired: 251224-guest-checkout.lock
+
+Branch Check:
+Current branch: main
+
+⚠️ WARNING: On Main Branch
+
+You are on the main branch. Implementing directly on main is dangerous.
+
+Options:
+- [create] Create branch: feature/guest-checkout
+- [continue] Continue on main anyway (not recommended)
+- [abort] Stop and create branch manually
+```
+
+```
+You: create
+```
+
+**AI Response:**
+```
+Branch Created
+
+$ git checkout -b feature/guest-checkout
+Switched to a new branch 'feature/guest-checkout'
+
+New branch: feature/guest-checkout
+Based on: main
 
 Implementation Plan:
 1. Create GuestCheckoutService
@@ -490,10 +523,10 @@ All tests passing ✓
 
 ## Phase 4: Review
 
-### Step 1: Create PR Package
+### Step 1: Create PR Package and Push to GitHub
 
 ```
-You: /asdf:pr guest-checkout
+You: /asdf:pr guest-checkout --push
 ```
 
 **AI Response:**
@@ -506,7 +539,7 @@ Generating PR bundle...
 
 **Feature:** Guest Checkout
 **Spec Version:** 1.2.0
-**Branch:** feature/251224-guest-checkout
+**Branch:** feature/guest-checkout
 
 ### Changes
 
@@ -536,33 +569,42 @@ Generating PR bundle...
 | AC-008 | Progress indicator | ✅ Implemented |
 | AC-009 | Express checkout | ⚠️ Partial (Google Pay only) |
 
-### Known Deviations
-- Apple Pay deferred (merchant verification pending)
+Package: .pr-review/251224-guest-checkout/
 
-### Test Results
-- Unit: 8/8 passing
-- Integration: 4/4 passing
-- API: 8/8 passing
-- E2E: 1/1 passing
+Pushing to GitHub...
 
-### Review Checklist
-- [ ] Code follows project standards
-- [ ] All AC verified
-- [ ] Tests cover critical paths
-- [ ] No security vulnerabilities
-- [ ] Documentation updated
+$ git push -u origin feature/guest-checkout
+$ gh pr create --title "[Feature] Guest Checkout" --body-file .pr-review/251224-guest-checkout/summary.md
 
-PR Package saved to: 04-operations/pr-packages/251224-guest-checkout.md
+**PR Created on GitHub**
+
+Branch: feature/guest-checkout
+PR #42: https://github.com/shopfast/shopfast/pull/42
+Base: main
+
+Next: AI review will be posted to this PR
 ```
 
-### Step 2: AI Code Review
+### Step 2: AI Code Review (Auto-Posted to GitHub)
 
 ```
-You: /asdf:review 04-operations/pr-packages/251224-guest-checkout.md
+You: /asdf:review .pr-review/251224-guest-checkout/
 ```
 
 **AI Response:**
 ```
+**Remote PR Detected**
+
+PR #42: [Feature] Guest Checkout
+URL: https://github.com/shopfast/shopfast/pull/42
+Status: OPEN
+
+Review will be posted as comment to this PR.
+
+Proceeding with review...
+
+---
+
 AI CODE REVIEW: Guest Checkout
 
 Reviewing from fresh context...
@@ -609,6 +651,18 @@ None
 
 ## Verdict
 ✅ APPROVED - Ready for merge after addressing "Should Fix" items
+
+---
+
+**Review Posted to GitHub**
+
+PR #42: https://github.com/shopfast/shopfast/pull/42
+Verdict: APPROVE
+Comment: Posted ✓
+
+$ gh pr review 42 --approve --body "AI Review: APPROVED"
+
+Next: Fix issues, then merge with /asdf:merge guest-checkout
 ```
 
 ### Step 3: Apply Fixes
@@ -637,12 +691,16 @@ Files modified:
 Re-running tests...
 ✓ All 22 tests passing
 
-Fixes applied ✓
+Pushing fixes...
+$ git add . && git commit -m "fix: add CSRF protection and session expiry tests"
+$ git push
+
+Fixes applied and pushed ✓
 ```
 
 ---
 
-## Phase 5: Completion
+## Phase 5: Sync
 
 ### Step 1: Sync Deviations
 
@@ -690,9 +748,108 @@ Changes:
 - Changelog entry: "v1.3.0 - Synced Apple Pay deferral"
 
 Spec and code are now aligned ✓
+
+Next: Merge PR with /asdf:merge guest-checkout
 ```
 
-### Step 2: Final Report
+---
+
+## Phase 6: Merge
+
+### Step 1: Merge PR
+
+```
+You: /asdf:merge guest-checkout
+```
+
+**AI Response:**
+```
+MERGE MODE: Guest Checkout
+
+Locating PR...
+PR #42: [Feature] Guest Checkout
+URL: https://github.com/shopfast/shopfast/pull/42
+
+**Approval Status**
+
+$ gh pr view 42 --json reviews
+Status: APPROVED ✓
+Approved by: ai-reviewer, @teammate
+
+**CI Status**
+
+$ gh pr checks 42
+| Check | Status |
+|-------|--------|
+| build | ✓ PASS |
+| test | ✓ PASS |
+| lint | ✓ PASS |
+
+All checks passing ✓
+
+Proceeding to merge...
+
+$ gh pr merge 42 --squash --delete-branch
+
+**PR Merged Successfully**
+
+PR #42: [Feature] Guest Checkout
+Strategy: squash
+Merged to: main
+
+Remote branch deleted: feature/guest-checkout
+
+Proceeding to cleanup...
+```
+
+### Step 2: Local Cleanup
+
+```
+**Cleanup in progress...**
+
+$ git checkout main
+Switched to branch 'main'
+
+$ git pull origin main
+Already up to date.
+
+$ git branch -d feature/guest-checkout
+Deleted branch feature/guest-checkout.
+
+Archive PR package:
+.pr-review/251224-guest-checkout/ → .pr-review/archived/251224-guest-checkout/
+
+Update execution file:
+04-operations/active/guest-checkout.md → 04-operations/completed/guest-checkout.md
+
+Release lock:
+Deleted: 04-operations/locks/guest-checkout.lock
+
+**Merge Complete**
+
+## Summary
+
+| Item | Status |
+|------|--------|
+| PR Merged | ✓ #42 |
+| Strategy | squash |
+| Remote Branch | ✓ Deleted |
+| Local Branch | ✓ Deleted |
+| PR Package | ✓ Archived |
+| Execution File | ✓ Moved to completed |
+| Lock | ✓ Released |
+
+## Merged PR
+
+- **Title:** [Feature] Guest Checkout
+- **Base:** main
+- **Commits:** 8 commits squashed into 1
+- **URL:** https://github.com/shopfast/shopfast/pull/42
+
+Feature is now live on main ✓
+```
+
+### Step 3: Final Report
 
 ```
 You: /asdf:report guest-checkout
@@ -702,7 +859,7 @@ You: /asdf:report guest-checkout
 ```
 FEATURE REPORT: Guest Checkout
 
-## Status: ✅ COMPLETE
+## Status: ✅ COMPLETE & MERGED
 
 | Metric | Value |
 |--------|-------|
@@ -710,6 +867,8 @@ FEATURE REPORT: Guest Checkout
 | Implementation | 100% |
 | Test Coverage | 95% |
 | Review Status | Approved |
+| Merge Status | ✅ Merged to main |
+| PR | #42 (closed) |
 
 ## Acceptance Criteria
 
@@ -733,9 +892,9 @@ FEATURE REPORT: Guest Checkout
 
 ## Deliverables
 - Spec: astraler-docs/03-features/251224-guest-checkout/spec.md
-- Code: 15 files, ~1,250 lines
+- Code: Merged to main (15 files, ~1,250 lines)
 - Tests: 22 test cases
-- PR: Ready for merge
+- PR: #42 (merged)
 
 ## Phase 2 Items (Deferred)
 - Apple Pay integration (needs merchant verification)
@@ -744,10 +903,11 @@ FEATURE REPORT: Guest Checkout
 - Design: 1 hour (3 refinement iterations)
 - Implementation: 4 hours
 - Testing: 1 hour
-- Review: 30 minutes
+- Review + Fixes: 30 minutes
+- Merge: 5 minutes
 - Total: ~6.5 hours
 
-Feature ready for production ✓
+Feature complete and deployed ✓
 ```
 
 ---
@@ -758,25 +918,27 @@ Feature ready for production ✓
 |-------|---------|--------|
 | 1. Design | `/asdf:spec guest-checkout` | Spec v1.2.0 |
 | 1. Design | (3 feedback iterations) | Refinements |
-| 2. Implement | `/asdf:code ...` | 15 files created |
+| 2. Implement | `/asdf:code ...` | Branch created + 15 files |
 | 2. Implement | (Deviation B chosen) | Apple Pay deferred |
 | 3. Test | `/asdf:test guest-checkout` | 21 tests generated |
 | 3. Test | Run tests | All passing |
-| 4. Review | `/asdf:pr guest-checkout` | PR package |
-| 4. Review | `/asdf:review ...` | Approved + fixes |
-| 5. Complete | `/asdf:sync guest-checkout` | Spec v1.3.0 |
-| 5. Complete | `/asdf:report guest-checkout` | Feature complete |
+| 4. Review | `/asdf:pr guest-checkout --push` | PR #42 on GitHub |
+| 4. Review | `/asdf:review ...` | Review posted to PR |
+| 5. Sync | `/asdf:sync guest-checkout` | Spec v1.3.0 |
+| 6. Merge | `/asdf:merge guest-checkout` | Merged + cleanup |
+| 6. Merge | `/asdf:report guest-checkout` | Feature complete |
 
 ---
 
 ## Key Takeaways
 
-1. **Refinement is normal** — 3 iterations to get spec right
-2. **Deviations happen** — Option B lets you continue without blocking
-3. **Test matrix guides** — Know what to test at each level
-4. **Review catches issues** — AI review found CSRF gap
-5. **Sync maintains truth** — Spec reflects reality after implementation
-6. **Reports show progress** — Clear status for stakeholders
+1. **Branch first** — Auto-create feature branch before coding
+2. **Refinement is normal** — 3 iterations to get spec right
+3. **Deviations happen** — Option B lets you continue without blocking
+4. **Test matrix guides** — Know what to test at each level
+5. **Review to GitHub** — AI review posts directly to PR
+6. **Sync maintains truth** — Spec reflects reality after implementation
+7. **Merge cleans up** — Branch, package, lock all handled automatically
 
 ---
 
@@ -785,9 +947,10 @@ Feature ready for production ✓
 | Phase | Duration | % of Total |
 |-------|----------|------------|
 | Design | 1 hour | 15% |
-| Implementation | 4 hours | 62% |
+| Implementation | 4 hours | 60% |
 | Testing | 1 hour | 15% |
-| Review + Fixes | 30 min | 8% |
-| **Total** | **6.5 hours** | **100%** |
+| Review + Fixes | 30 min | 7% |
+| Merge | 5 min | 3% |
+| **Total** | **~6.5 hours** | **100%** |
 
-Spec-driven development: ~38% design/test/review, ~62% coding.
+Spec-driven development: ~40% design/test/review/merge, ~60% coding.

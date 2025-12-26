@@ -276,6 +276,131 @@ You operate in one of the following modes based on the command received:
 
 ---
 
+### MERGE MODE (`/asdf:merge`)
+
+**Purpose:** Merge approved PR with automatic cleanup
+
+**Behavior:**
+1. Locate PR by feature name
+2. Check PR exists on remote (`gh pr view`)
+3. **Check approval status:**
+   - APPROVED → proceed
+   - CHANGES_REQUESTED or PENDING → warn, offer options
+4. **Check CI status:**
+   - All PASS → proceed
+   - Any FAIL → block, show details
+   - PENDING → warn, offer options
+5. **Execute merge:**
+   ```bash
+   gh pr merge [PR#] --squash --delete-branch
+   # Or: --merge, --rebase based on settings
+   ```
+6. **Cleanup:**
+   - Switch to main, pull latest
+   - Delete local feature branch
+   - Archive PR package (`.pr-review/` → `.pr-review/archived/`)
+   - Move execution file to completed
+   - Release lock if exists
+7. Present completion summary
+
+**Output:** Merged PR with full cleanup
+
+**Mindset:** Cautious, thorough, cleanup-oriented.
+
+---
+
+### CONFIG MODE (`/asdf:config`)
+
+**Purpose:** View and manage ASDF settings
+
+**Behavior:**
+1. **No arguments:** Show all current settings
+2. **`--list`:** Show all available settings with options
+3. **`[key]`:** Show specific setting value
+4. **`[key] [value]`:** Update setting, validate value
+5. **`--reset`:** Confirm, then reset all to defaults
+
+**Settings managed:**
+- `git.provider` — github, gitlab, bitbucket
+- `git.default_branch` — main, master, etc.
+- `git.merge_strategy` — squash, merge, rebase
+- `git.auto_delete_branch` — true, false
+- `git.auto_post_review` — true, false
+- `locks.timeout_hours` — 1-24
+
+**Storage:** `04-operations/settings.yaml`
+
+**Output:** Current/updated settings display
+
+**Mindset:** Configuration-focused, validate inputs.
+
+---
+
+### GUARDIAN MODE (`/asdf:guardian`)
+
+**Purpose:** Full pipeline scan showing all features, their current stage, and health status
+
+**Behavior:**
+1. **Scan all features:**
+   - `03-features/*/` — All feature specs
+   - `04-operations/active/` — Active execution files
+   - `04-operations/completed/` — Completed features
+   - `.pr-review/` — Local PR packages
+   - `gh pr list --json` — Remote PR status
+
+2. **Determine stage for each feature:**
+   ```
+   SPEC → CODE → TEST → PR_LOCAL → PR_PUSHED → CI → REVIEW → MERGED
+   ```
+
+3. **Calculate stale status (fixed thresholds):**
+   | Condition | Threshold | Alert |
+   |-----------|-----------|-------|
+   | PR not pushed | > 1 day | ⚠️ STALE |
+   | PR not reviewed | > 2 days | ⚠️ STALE |
+   | CI failing | > 1 day | 🔴 BLOCKED |
+   | Approved not merged | > 1 day | ⚠️ STALE |
+   | Spec without execution | > 7 days | 💤 DORMANT |
+   | Coding phase | > 3 days | ⚠️ SLOW |
+
+4. **Calculate health score:**
+   ```
+   Health = (Non-stale / Total active) × 100
+   90-100%: 🟢 Healthy
+   70-89%:  🟡 Attention Needed
+   50-69%:  🟠 At Risk
+   < 50%:   🔴 Critical
+   ```
+
+5. **Present pipeline report with alerts and recommendations**
+
+**Flags:**
+- `--json` — Output as JSON
+- `--stage [STAGE]` — Filter by specific stage
+- `--stale` — Show only stale/blocked features
+
+**Output:** Pipeline view with health score, alerts, and recommendations
+
+**Mindset:** Oversight, proactive, actionable recommendations.
+
+---
+
+### VERSION MODE (`/asdf:version`)
+
+**Purpose:** Display toolkit version and changelog
+
+**Behavior:**
+1. Display current version: **v2.0.0**
+2. Display hardcoded changelog (all versions)
+3. No file reads required
+4. No configuration needed
+
+**Output:** Version number with changelog
+
+**Mindset:** Informational, simple, direct.
+
+---
+
 ## Mandatory Behaviors
 
 ### 1. Reference Collection (DESIGN MODE only)
@@ -594,33 +719,53 @@ Before marking any task complete:
 
 ---
 
-## v4 Features Summary
+## v2.0.0 Features Summary (Guardian & Versioning)
 
 | Feature | Purpose | Mode |
 |---------|---------|------|
-| Incomplete Init Detection | Resume interrupted init | DESIGN |
-| Component Update | Update specific docs with impact | UPDATE |
-| Test Matrix | Classify tests by type and tool | TEST |
-| Playwright E2E | Generate E2E test files | TEST |
-| Feature Reports | Progress by feature | REPORT |
-| Project Reports | Overall health dashboard | REPORT |
-| Spec Audit | Detect outdated/missing/orphaned | AUDIT |
-| Tech Debt Tracking | Centralized debt registry | ALL |
-| Spec Cleanup | Remove unused specs | CLEANUP |
-| Enhanced Handoff | Rich context for continuity | SYNC |
-| Onboard Tour | 5-min guided introduction | ONBOARD |
-| Spec Locking | Prevent parallel spec edits | DESIGN, UPDATE |
-| Admin Unlock | Force release stale/abandoned locks | UNLOCK |
-| Command Help | Reference and --help flags | HELP |
+| Pipeline Guardian | Full scan of all features with stage detection | GUARDIAN |
+| Stale Detection | Fixed thresholds for identifying stuck work | GUARDIAN |
+| Health Score | Calculate project health percentage | GUARDIAN |
+| Toolkit Versioning | Display version and changelog | VERSION |
+| Alert Recommendations | Actionable suggestions for blocked/stale items | GUARDIAN |
 
-## v3 Features (Retained)
+## v1.2.0 Features Summary (Git Workflow)
 
 | Feature | Purpose | Mode |
 |---------|---------|------|
+| Remote PR Detection | Check if PR exists on GitHub | REVIEW |
+| Auto-Post Review | Post AI review to PR comment | REVIEW |
+| Auto-Push PR | Create PR on GitHub with --push | PR |
+| Feature Branch Check | Warn if on main branch | EXECUTE |
+| Auto-Branch Creation | Create feature branch before code | EXECUTE |
+| PR Merge Flow | Merge approved PR with cleanup | MERGE |
+| Settings Management | Configure git and lock settings | CONFIG |
+
+## v1.1.0 Features Summary (PR & Review)
+
+| Feature | Purpose | Mode |
+|---------|---------|------|
+| PR Package Creation | Bundle changes for review | PR |
+| AI Code Review | Automated quality check | REVIEW |
+| Multi-Instance Locks | Prevent parallel conflicts | EXECUTE |
+| Execution File Tracking | Per-feature progress | EXECUTE |
+
+## v1.0.0 Features Summary (Foundation)
+
+| Feature | Purpose | Mode |
+|---------|---------|------|
+| Project Init | Initialize ASDF structure | DESIGN |
+| Spec Creation | Create feature specifications | DESIGN |
+| Implementation | Execute code from specs | EXECUTE |
+| Test Generation | Create test suites from ACs | TEST |
+| Reverse Sync | Update specs from code | SYNC |
+| Roadmap Management | Phase-based planning | DESIGN |
+| Session Handoff | Continuity notes | HANDOFF |
 | Dependency Check | Block if prerequisites missing | EXECUTE |
 | Impact Analysis | Detect breaking changes | EXECUTE |
-| Multi-Instance Lock | Prevent parallel conflicts | EXECUTE |
-| Test Generation | Create test suites from specs | TEST |
-| PR Package | Bundle changes for review | PR |
-| AI Review | Automated code quality check | REVIEW |
-| Roadmap | Phase-based feature management | DESIGN |
+| Component Update | Update specific docs | UPDATE |
+| Reports | Progress and health dashboard | REPORT |
+| Spec Audit | Detect outdated/orphaned specs | AUDIT |
+| Spec Cleanup | Remove unused specs | CLEANUP |
+| Onboard Tour | Guided introduction | ONBOARD |
+| Command Help | Reference and --help flags | HELP |
