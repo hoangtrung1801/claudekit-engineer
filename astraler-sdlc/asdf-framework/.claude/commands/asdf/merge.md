@@ -220,9 +220,27 @@ To resolve manually:
 5. **Release lock (if exists):**
    - Delete: `04-operations/locks/[feature].lock`
 
+6. **Update spec status to "Completed":**
+   - Update spec header: `Status: Completed` ← (changed from Synced)
+   - Update `Last Updated:` timestamp
+
 ---
 
-### Step 6: Present Result
+### Step 6: Update Spec Status
+
+**Update feature spec to "Completed":**
+
+```markdown
+> **Version:** X.Y.Z
+> **Status:** Completed ← (changed from Synced)
+> **Last Updated:** YYMMDD
+```
+
+This marks the feature as fully delivered to main branch.
+
+---
+
+### Step 7: Present Result
 
 ```markdown
 **Merge Complete**
@@ -237,6 +255,7 @@ To resolve manually:
 | Local Branch | ✓ Deleted |
 | PR Package | ✓ Archived |
 | Execution File | ✓ Moved to completed |
+| Spec Status | ✓ Completed |
 | Lock | ✓ Released |
 
 ## Merged PR
@@ -306,5 +325,6 @@ What it does:
   4. Deletes remote and local branches
   5. Archives PR package
   6. Moves execution file to completed
-  7. Releases any locks
+  7. Updates spec status to "Completed"
+  8. Releases any locks
 ```

@@ -18,6 +18,38 @@ argument-hint: [spec-path]
 
 ## Workflow
 
+### Step 0.5: Check Spec Status
+
+1. Load the spec at provided path (or find by feature name in `astraler-docs/03-features/`)
+2. Check spec status from header
+
+**If status is NOT "Synced":**
+
+```markdown
+**⚠️ WARNING: Spec Not Synced**
+
+Spec Status: [Draft | Review | Approved | Implemented]
+
+The spec has not been synced with the implementation yet.
+Tests generated from an unsynced spec may not reflect the actual code behavior.
+
+**Correct workflow order:**
+1. `/asdf:code` → Status becomes "Implemented"
+2. `/asdf:sync` → Status becomes "Synced"
+3. `/asdf:test` → Generate tests from synced spec ← You are here
+
+**Options:**
+- **[proceed]** Generate tests anyway (may need updates later)
+- **[sync-first]** Run `/asdf:sync` first, then come back
+- **[abort]** Cancel and sync manually
+
+What would you like to do?
+```
+
+**If status is "Synced":** Continue to Step 1.
+
+---
+
 ### Step 1: Load Spec and Test Context
 
 1. Load the spec at provided path (or find by feature name in `astraler-docs/03-features/`)
@@ -79,8 +111,9 @@ Spec Version: [X.Y.Z]
 - Performance: [if NFR defined]
 
 **Options:**
-- **[yes]** Generate all tests (Unit + Integration + API + E2E)
+- **[yes]** Generate all tests (Unit + Integration + API + E2E files)
 - **[skip-e2e]** Generate Unit + Integration + API only (recommended for most features)
+- **[run-e2e]** Generate Unit/Integration/API files + run E2E via Playwright MCP directly
 - **[feedback]** Adjust test plan
 ```
 
@@ -128,10 +161,41 @@ describe('[Feature] API', () => {
 });
 ```
 
-**E2E Tests (Playwright) — Optional:**
+**E2E Tests (Playwright MCP) — Optional:**
 
 > E2E tests add complexity. Only use for critical user journeys.
 > Use `skip-e2e` option if not needed.
+
+**Two Options for E2E Testing:**
+
+**Option A: Run Directly via Playwright MCP (Recommended)**
+
+If Playwright MCP is available, run E2E tests interactively without generating files:
+
+```markdown
+**E2E Test: [AC-XXX] - [description]**
+
+Running via Playwright MCP...
+
+1. Navigate to [url]
+2. [Action from spec user flow]
+3. Assert: [expected result]
+
+Result: ✅ PASS | ❌ FAIL
+
+[Screenshot captured if needed]
+```
+
+Use MCP tools:
+- `playwright_navigate` — Go to URL
+- `playwright_click` — Click elements
+- `playwright_fill` — Fill form fields
+- `playwright_screenshot` — Capture state
+- `playwright_evaluate` — Run assertions
+
+**Option B: Generate Test File**
+
+For CI/CD integration, generate Playwright test files:
 
 ```typescript
 // e2e/[feature].spec.ts
@@ -294,7 +358,13 @@ Tests Generated: [N] total
 - `yes` — Generate all tests including E2E
 - `feedback` — Adjust test plan
 
+**Correct Workflow Order:**
+1. `/asdf:code` — Implement feature → Status: Implemented
+2. `/asdf:sync` — Sync deviations → Status: Synced
+3. `/asdf:test` — Generate tests ← Run after sync!
+
 **Related:**
-- `/asdf:code` — Implement feature (run tests after)
+- `/asdf:code` — Implement feature
+- `/asdf:sync` — Sync spec with code (run BEFORE test)
 - `/asdf:report` — Check test coverage
 - `/asdf` — All commands

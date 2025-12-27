@@ -13,8 +13,8 @@ Practical examples and visual diagrams to help you understand ASDF workflows.
 | 03 | [Team Collaboration](03-team-collaboration.md) | 2 developers working in parallel | Multi-instance setups |
 | 04 | [Maintenance Workflow](04-maintenance-workflow.md) | Fixing drifted specs, tech debt | Project health |
 | 05 | [Feature Lifecycle](05-feature-lifecycle.md) | Guest Checkout end-to-end | Complete 6-phase workflow |
-| 06 | [Git Workflow](06-git-workflow.md) | PR lifecycle with GitHub | Git integration (v1.2) |
-| 07 | [Pipeline Oversight](07-pipeline-oversight.md) | Guardian pipeline supervision | Project oversight (v2.0) |
+| 06 | [Git Workflow](06-git-workflow.md) | PR lifecycle with GitHub | Git integration (v2.1) |
+| 07 | [Pipeline Oversight](07-pipeline-oversight.md) | Guardian pipeline supervision | Project oversight (v2.1) |
 | 08 | [Testing Workflow](08-testing-workflow.md) | Spec-driven test generation | Test strategy & coverage |
 
 ---
@@ -55,7 +55,7 @@ Practical examples and visual diagrams to help you understand ASDF workflows.
 
 **Using Git/GitHub integration?**
 1. Read [06-git-workflow.md](06-git-workflow.md) — covers PR lifecycle
-2. Key commands: `/asdf:pr --push`, `/asdf:review`, `/asdf:merge`
+2. Key commands: `/asdf:pr` (pushes by default), `/asdf:review`, `/asdf:merge`
 
 **Need pipeline oversight?**
 1. Read [07-pipeline-oversight.md](07-pipeline-oversight.md) — Guardian feature

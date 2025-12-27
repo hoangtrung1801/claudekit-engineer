@@ -300,13 +300,15 @@ Update `astraler-docs/04-operations/implementation-active.md`:
 
 1. Check each acceptance criterion from spec
 2. Run relevant tests
-3. Present completion report:
+3. **Update spec status to "Implemented"** in spec header
+4. Present completion report:
 
 ```markdown
 **Implementation Complete**
 
 - **Feature:** [feature-name]
 - **Spec Version:** [X.Y.Z]
+- **Spec Status:** Implemented ← (updated from Approved)
 - **Files Modified:** [N]
 
 **Acceptance Criteria:**
@@ -317,8 +319,16 @@ Update `astraler-docs/04-operations/implementation-active.md`:
 **Deviations:** [N] (resolved via A/B/C)
 
 **Next steps:**
-- Run `/asdf:sync` if deviations exist
+- Run `/asdf:sync` to update spec and set status to "Synced"
+- Then run `/asdf:test` to generate tests from synced spec
 - Update `session-handoff.md` before ending session
+```
+
+**Spec header update:**
+```markdown
+> **Version:** X.Y.Z
+> **Status:** Implemented ← (changed from Approved)
+> **Last Updated:** YYMMDD
 ```
 
 ---

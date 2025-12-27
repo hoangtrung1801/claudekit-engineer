@@ -32,7 +32,7 @@ You are a **Coder AI** operating under the direction of a **Product Architect**.
 | `/asdf:code [spec-path]` | Execute implementation from specification |
 | `/asdf:test [feature]` | Generate test cases from spec acceptance criteria |
 | `/asdf:sync` | Trigger Reverse Sync (Code → Docs) |
-| `/asdf:pr [feature]` | Create PR package for code review (add `--push` for GitHub) |
+| `/asdf:pr [feature]` | Create PR package and push to GitHub (use `--local` to skip push) |
 | `/asdf:review [path]` | AI code review from fresh context |
 | `/asdf:merge [feature]` | Merge approved PR with cleanup |
 | `/asdf:guardian` | Full pipeline scan with health score |

@@ -45,12 +45,26 @@ You: /asdf:version
 
 **AI Response:**
 ```
-ASDF Toolkit v2.0.0
+ASDF Toolkit v2.1.0
 Astraler Spec-Driven Framework
 
 Changelog:
 ───────────────────────────────────
-v2.0.0 (Current)
+v2.1.0 (Current)
+  ├─ 6-state spec status lifecycle
+  │   └─ Draft → Review → Approved → Implemented → Synced → Completed
+  ├─ Auto status: /asdf:code → Implemented
+  ├─ Auto status: /asdf:sync → Synced
+  ├─ Auto status: /asdf:merge → Completed
+  ├─ /asdf:pr pushes by default (--local to skip)
+  ├─ /asdf:sync detects and updates related docs (impact analysis)
+  ├─ /asdf:test warns if spec not synced
+  ├─ Guardian shows spec status column
+  ├─ "Not synced" alert in Guardian
+  ├─ Playwright MCP for E2E testing
+  └─ Correct workflow: Code → Sync → Test
+
+v2.0.0
   ├─ /asdf:guardian — Pipeline supervisor
   ├─ /asdf:version — Toolkit versioning
   ├─ Stale detection thresholds
@@ -60,7 +74,7 @@ v1.2.0
   ├─ /asdf:merge — PR merge with cleanup
   ├─ /asdf:config — Settings management
   ├─ Auto-branch creation in /asdf:code
-  └─ Auto-push in /asdf:pr --push
+  └─ Auto-push in /asdf:pr
 ───────────────────────────────────
 
 Documentation: case-studies/README.md
@@ -83,45 +97,49 @@ Health Score: 72% 🟡 Attention Needed
 Active Features: 10 | Stale: 3 | Blocked: 1
 
 PIPELINE VIEW
-─────────────────────────────────────────────────────────────────────────
-Stage      │ Feature                    │ Age    │ Status
-─────────────────────────────────────────────────────────────────────────
-SPEC       │ 251230-wishlist            │ 2d     │ ✓ Planning
-           │ 251229-recommendations     │ 9d     │ 💤 Dormant
-─────────────────────────────────────────────────────────────────────────
-CODE       │ 251228-payment-retry       │ 1d     │ ✓ In Progress
-           │ 251227-user-settings       │ 5d     │ ⚠️ Slow
-─────────────────────────────────────────────────────────────────────────
-TEST       │ 251226-checkout-v2         │ 1d     │ ✓ Testing
-─────────────────────────────────────────────────────────────────────────
-PR_LOCAL   │ 251225-inventory-alerts    │ 2d     │ ⚠️ Stale (not pushed)
-─────────────────────────────────────────────────────────────────────────
-PR_PUSHED  │ 251224-order-history       │ 1d     │ ✓ Awaiting Review
-           │ 251223-discount-engine     │ 3d     │ ⚠️ Stale (not reviewed)
-─────────────────────────────────────────────────────────────────────────
-CI         │ 251222-guest-checkout      │ 2d     │ 🔴 Blocked (CI failing)
-─────────────────────────────────────────────────────────────────────────
-REVIEW     │ 251221-cart-persistence    │ 0d     │ ✓ Ready to Merge
-─────────────────────────────────────────────────────────────────────────
-MERGED     │ 251218-product-search      │ —      │ ✓ Complete
-           │ 251215-user-auth           │ —      │ ✓ Complete
+───────────────────────────────────────────────────────────────────────────────────
+Stage      │ Feature                    │ Age    │ Spec Status │ Status
+───────────────────────────────────────────────────────────────────────────────────
+SPEC       │ 251230-wishlist            │ 2d     │ Draft       │ ✓ Planning
+           │ 251229-recommendations     │ 9d     │ Draft       │ 💤 Dormant
+───────────────────────────────────────────────────────────────────────────────────
+CODE       │ 251228-payment-retry       │ 1d     │ Approved    │ ✓ In Progress
+           │ 251227-user-settings       │ 5d     │ Approved    │ ⚠️ Slow
+───────────────────────────────────────────────────────────────────────────────────
+TEST       │ 251226-checkout-v2         │ 1d     │ Synced      │ ✓ Testing
+───────────────────────────────────────────────────────────────────────────────────
+PR_LOCAL   │ 251225-inventory-alerts    │ 2d     │ ⚠️ Not Synced │ ⚠️ Stale (not pushed)
+───────────────────────────────────────────────────────────────────────────────────
+PR_PUSHED  │ 251224-order-history       │ 1d     │ Synced      │ ✓ Awaiting Review
+           │ 251223-discount-engine     │ 3d     │ Synced      │ ⚠️ Stale (not reviewed)
+───────────────────────────────────────────────────────────────────────────────────
+CI         │ 251222-guest-checkout      │ 2d     │ ⚠️ Not Synced │ 🔴 Blocked (CI failing)
+───────────────────────────────────────────────────────────────────────────────────
+REVIEW     │ 251221-cart-persistence    │ 0d     │ Synced      │ ✓ Ready to Merge
+───────────────────────────────────────────────────────────────────────────────────
+MERGED     │ 251218-product-search      │ —      │ Completed   │ ✓ Complete
+           │ 251215-user-auth           │ —      │ Completed   │ ✓ Complete
 ═══════════════════════════════════════════════════════════════════════
 
-ALERTS (4)
+ALERTS (6)
 ─────────────────────────────────────────────────────────────────────────
 💤 251229-recommendations  │ Dormant 9 days       │ Start or archive
-⚠️  251225-inventory-alerts │ PR not pushed 2 days │ /asdf:pr --push
+⚠️  251225-inventory-alerts │ PR not pushed 2 days │ /asdf:pr
+⚠️  251225-inventory-alerts │ Spec not synced      │ /asdf:sync
 ⚠️  251223-discount-engine  │ Not reviewed 3 days  │ Request review
 🔴 251222-guest-checkout   │ CI failing 2 days    │ Fix failing tests
+⚠️  251222-guest-checkout   │ Spec not synced      │ /asdf:sync
 ─────────────────────────────────────────────────────────────────────────
 
 RECOMMENDATIONS
 ─────────────────────────────────────────────────────────────────────────
 1. Merge approved PR: /asdf:merge cart-persistence
-2. Push stale PR: /asdf:pr inventory-alerts --push
-3. Fix CI: Check 251222-guest-checkout test failures
-4. Request review for: 251223-discount-engine
-5. Decide on dormant: 251229-recommendations (9 days idle)
+2. Sync specs before PR: /asdf:sync inventory-alerts
+3. Push stale PR: /asdf:pr inventory-alerts
+4. Fix CI: Check 251222-guest-checkout test failures
+5. Sync spec: /asdf:sync guest-checkout
+6. Request review for: 251223-discount-engine
+7. Decide on dormant: 251229-recommendations (9 days idle)
 ─────────────────────────────────────────────────────────────────────────
 
 Last scan: 2025-12-26 09:00:00
@@ -280,6 +298,7 @@ You: /asdf:guardian --json
 | Approved not merged | > 1 day | ⚠️ STALE |
 | Spec without execution | > 7 days | 💤 DORMANT |
 | Coding phase | > 3 days | ⚠️ SLOW |
+| Spec not synced | After code | ⚠️ NOT SYNCED |
 
 ---
 
@@ -320,7 +339,8 @@ Ratings:
 |----------------|-------------|
 | Dormant spec | `/asdf:code [spec]` or archive |
 | Slow coding | Check blockers, continue work |
-| PR not pushed | `/asdf:pr [feature] --push` |
+| Spec not synced | `/asdf:sync [feature]` |
+| PR not pushed | `/asdf:pr [feature]` |
 | CI failing | Fix tests, push again |
 | Not reviewed | Request review manually |
 | Ready to merge | `/asdf:merge [feature]` |
@@ -342,7 +362,9 @@ Ratings:
 ## Key Takeaways
 
 1. **Pipeline visibility** — See all features at every stage
-2. **Stale detection** — Fixed thresholds catch stuck work
-3. **Health scoring** — Quantify project status
-4. **Actionable alerts** — Know exactly what to fix
-5. **Flexible filtering** — Focus on specific stages or issues
+2. **Spec status tracking** — 6-state lifecycle visible in Guardian
+3. **Stale detection** — Fixed thresholds catch stuck work
+4. **Sync alerts** — Warns when specs don't match code
+5. **Health scoring** — Quantify project status
+6. **Actionable alerts** — Know exactly what to fix
+7. **Flexible filtering** — Focus on specific stages or issues

@@ -18,31 +18,34 @@ flowchart LR
     subgraph Phase2["Phase 2: Implement"]
         D["Create Branch"] --> E["/asdf:code"]
         E --> F["Deviation B"]
-        F --> G["Code Complete"]
+        F --> G["Status: Implemented"]
     end
 
-    subgraph Phase3["Phase 3: Test"]
-        H["/asdf:test"] --> I["21 Tests"]
-        I --> J["All Pass"]
+    subgraph Phase3["Phase 3: Sync"]
+        H["/asdf:sync"] --> I["Spec v1.3.0"]
+        I --> J["Status: Synced"]
     end
 
-    subgraph Phase4["Phase 4: Review"]
-        K["/asdf:pr --push"] --> L["PR on GitHub"]
-        L --> M["/asdf:review"]
-        M --> N["Posted to PR"]
+    subgraph Phase4["Phase 4: Test"]
+        K["/asdf:test"] --> L["21 Tests"]
+        L --> M["All Pass"]
     end
 
-    subgraph Phase5["Phase 5: Sync"]
-        O["/asdf:sync"] --> P["Spec v1.3.0"]
+    subgraph Phase5["Phase 5: Review"]
+        N["/asdf:pr --push"] --> O["PR on GitHub"]
+        O --> P["/asdf:review"]
+        P --> Q["Posted to PR"]
     end
 
     subgraph Phase6["Phase 6: Merge"]
-        Q["/asdf:merge"] --> R["Cleanup"]
-        R --> S["Feature Done ✓"]
+        R["/asdf:merge"] --> S["Cleanup"]
+        S --> T["Feature Done ✓"]
     end
 
     Phase1 --> Phase2 --> Phase3 --> Phase4 --> Phase5 --> Phase6
 ```
+
+> **Note:** The correct workflow order is Code → Sync → Test. This ensures tests are generated from a synced spec that accurately reflects the implementation.
 
 ---
 
@@ -387,12 +390,67 @@ Lock released: 251224-guest-checkout.lock
 
 Updated: implementation-active.md
 
-Next: Run tests with /asdf:test guest-checkout
+Next: Sync spec with /asdf:sync guest-checkout
 ```
 
 ---
 
-## Phase 3: Testing
+## Phase 3: Sync
+
+### Step 1: Sync Deviations
+
+```
+You: /asdf:sync guest-checkout
+```
+
+**AI Response:**
+```
+SYNC MODE: Guest Checkout
+
+Comparing implementation to spec...
+
+Deviations Found:
+
+| Section | Spec | Implementation | Action |
+|---------|------|----------------|--------|
+| AC-009 | Apple Pay + Google Pay | Google Pay only | Update spec |
+| Open Questions | None | Apple Pay merchant verification | Add to spec |
+
+Sync Preview:
+- AC-009: Update to "Google Pay (Apple Pay Phase 2)"
+- Add Open Question: "Apple Pay requires merchant verification"
+- Increment version to v1.3.0
+
+Options:
+- [confirm] Apply sync
+- [feedback] Adjust
+- [cancel] Abort
+```
+
+```
+You: confirm
+```
+
+**AI Response:**
+```
+Sync Complete
+
+Spec updated: 251224-guest-checkout v1.3.0
+Spec Status: Synced ← (changed from Implemented)
+
+Changes:
+- AC-009 updated to reflect partial implementation
+- Open Questions section added
+- Changelog entry: "v1.3.0 - Synced Apple Pay deferral"
+
+Spec and code are now aligned ✓
+
+Next: Generate tests with /asdf:test guest-checkout
+```
+
+---
+
+## Phase 4: Testing
 
 ### Step 1: Generate Tests
 
@@ -404,7 +462,8 @@ You: /asdf:test guest-checkout
 ```
 TEST MODE: Guest Checkout
 
-Loading spec: 251224-guest-checkout v1.2.0
+Loading spec: 251224-guest-checkout v1.3.0
+Spec Status: Synced ✓
 
 Analyzing acceptance criteria for test generation...
 
@@ -521,12 +580,12 @@ All tests passing ✓
 
 ---
 
-## Phase 4: Review
+## Phase 5: Review
 
 ### Step 1: Create PR Package and Push to GitHub
 
 ```
-You: /asdf:pr guest-checkout --push
+You: /asdf:pr guest-checkout
 ```
 
 **AI Response:**
@@ -689,67 +748,13 @@ Files modified:
 - __tests__/guest-checkout/GuestCheckoutService.test.ts (+22 lines)
 
 Re-running tests...
-✓ All 22 tests passing
+✓ All 24 tests passing (22 original + 2 new)
 
 Pushing fixes...
 $ git add . && git commit -m "fix: add CSRF protection and session expiry tests"
 $ git push
 
 Fixes applied and pushed ✓
-```
-
----
-
-## Phase 5: Sync
-
-### Step 1: Sync Deviations
-
-```
-You: /asdf:sync guest-checkout
-```
-
-**AI Response:**
-```
-SYNC MODE: Guest Checkout
-
-Comparing implementation to spec...
-
-Deviations Found:
-
-| Section | Spec | Implementation | Action |
-|---------|------|----------------|--------|
-| AC-009 | Apple Pay + Google Pay | Google Pay only | Update spec |
-| Open Questions | None | Apple Pay merchant verification | Add to spec |
-
-Sync Preview:
-- AC-009: Update to "Google Pay (Apple Pay Phase 2)"
-- Add Open Question: "Apple Pay requires merchant verification"
-- Increment version to v1.3.0
-
-Options:
-- [confirm] Apply sync
-- [feedback] Adjust
-- [cancel] Abort
-```
-
-```
-You: confirm
-```
-
-**AI Response:**
-```
-Sync Complete
-
-Spec updated: 251224-guest-checkout v1.3.0
-
-Changes:
-- AC-009 updated to reflect partial implementation
-- Open Questions section added
-- Changelog entry: "v1.3.0 - Synced Apple Pay deferral"
-
-Spec and code are now aligned ✓
-
-Next: Merge PR with /asdf:merge guest-checkout
 ```
 
 ---
@@ -838,6 +843,7 @@ Deleted: 04-operations/locks/guest-checkout.lock
 | PR Package | ✓ Archived |
 | Execution File | ✓ Moved to completed |
 | Lock | ✓ Released |
+| Spec Status | ✓ Completed |
 
 ## Merged PR
 
@@ -914,19 +920,21 @@ Feature complete and deployed ✓
 
 ## Complete Command Sequence
 
-| Phase | Command | Output |
-|-------|---------|--------|
-| 1. Design | `/asdf:spec guest-checkout` | Spec v1.2.0 |
-| 1. Design | (3 feedback iterations) | Refinements |
-| 2. Implement | `/asdf:code ...` | Branch created + 15 files |
-| 2. Implement | (Deviation B chosen) | Apple Pay deferred |
-| 3. Test | `/asdf:test guest-checkout` | 21 tests generated |
-| 3. Test | Run tests | All passing |
-| 4. Review | `/asdf:pr guest-checkout --push` | PR #42 on GitHub |
-| 4. Review | `/asdf:review ...` | Review posted to PR |
-| 5. Sync | `/asdf:sync guest-checkout` | Spec v1.3.0 |
-| 6. Merge | `/asdf:merge guest-checkout` | Merged + cleanup |
-| 6. Merge | `/asdf:report guest-checkout` | Feature complete |
+| Phase | Command | Output | Spec Status |
+|-------|---------|--------|-------------|
+| 1. Design | `/asdf:spec guest-checkout` | Spec v1.2.0 | Approved |
+| 1. Design | (3 feedback iterations) | Refinements | — |
+| 2. Implement | `/asdf:code ...` | Branch + 15 files | **Implemented** |
+| 2. Implement | (Deviation B chosen) | Apple Pay deferred | — |
+| 3. Sync | `/asdf:sync guest-checkout` | Spec v1.3.0 | **Synced** |
+| 4. Test | `/asdf:test guest-checkout` | 21 tests generated | (checked) |
+| 4. Test | Run tests | All passing | — |
+| 5. Review | `/asdf:pr guest-checkout` | PR #42 on GitHub | — |
+| 5. Review | `/asdf:review ...` | Review posted to PR | — |
+| 6. Merge | `/asdf:merge guest-checkout` | Merged + cleanup | **Completed** |
+| 6. Merge | `/asdf:report guest-checkout` | Feature complete | — |
+
+> **Workflow Order:** Code → Sync → Test ensures tests are generated from a synced spec.
 
 ---
 
@@ -935,10 +943,11 @@ Feature complete and deployed ✓
 1. **Branch first** — Auto-create feature branch before coding
 2. **Refinement is normal** — 3 iterations to get spec right
 3. **Deviations happen** — Option B lets you continue without blocking
-4. **Test matrix guides** — Know what to test at each level
-5. **Review to GitHub** — AI review posts directly to PR
-6. **Sync maintains truth** — Spec reflects reality after implementation
-7. **Merge cleans up** — Branch, package, lock all handled automatically
+4. **Status lifecycle** — Draft → Review → Approved → Implemented → Synced → Completed
+5. **Sync before test** — Always sync spec before generating tests
+6. **Test matrix guides** — Know what to test at each level
+7. **Review to GitHub** — AI review posts directly to PR
+8. **Merge cleans up** — Branch, package, lock all handled automatically
 
 ---
 
@@ -946,11 +955,12 @@ Feature complete and deployed ✓
 
 | Phase | Duration | % of Total |
 |-------|----------|------------|
-| Design | 1 hour | 15% |
-| Implementation | 4 hours | 60% |
-| Testing | 1 hour | 15% |
-| Review + Fixes | 30 min | 7% |
-| Merge | 5 min | 3% |
-| **Total** | **~6.5 hours** | **100%** |
+| 1. Design | 1 hour | 15% |
+| 2. Implementation | 4 hours | 60% |
+| 3. Sync | 10 min | 3% |
+| 4. Testing | 1 hour | 15% |
+| 5. Review + Fixes | 30 min | 5% |
+| 6. Merge | 5 min | 2% |
+| **Total** | **~6.75 hours** | **100%** |
 
-Spec-driven development: ~40% design/test/review/merge, ~60% coding.
+Spec-driven development: ~40% design/sync/test/review/merge, ~60% coding.

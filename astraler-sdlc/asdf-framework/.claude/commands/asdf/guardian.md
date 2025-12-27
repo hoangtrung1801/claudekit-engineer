@@ -82,12 +82,20 @@ For each feature folder in `03-features/`:
 
 | Condition | Threshold | Alert |
 |-----------|-----------|-------|
+| Implemented but not synced | Any | 🟡 NOT SYNCED |
 | PR created but not pushed | > 1 day | ⚠️ STALE |
 | PR pushed but not reviewed | > 2 days | ⚠️ STALE |
 | CI failing | > 1 day | 🔴 BLOCKED |
 | Approved but not merged | > 1 day | ⚠️ STALE |
 | Spec without execution | > 7 days | 💤 DORMANT |
 | Coding phase | > 3 days | ⚠️ SLOW |
+
+**Spec Status Alerts:**
+
+| Spec Status | Stage | Alert |
+|-------------|-------|-------|
+| Implemented | TEST | 🟡 Not Synced — run `/asdf:sync` before `/asdf:test` |
+| Implemented | PR_LOCAL+ | 🟡 Not Synced — sync spec before PR review |
 
 ### Step 4: Calculate Health Score
 
@@ -112,45 +120,54 @@ ASDF GUARDIAN — Pipeline Status
 ═══════════════════════════════════════════════════════════════════════
 
 Health Score: 85% 🟢 Healthy
-Active Features: 8 | Stale: 2 | Blocked: 1
+Active Features: 8 | Stale: 2 | Blocked: 1 | Unsynced: 1
 
 PIPELINE VIEW
 ─────────────────────────────────────────────────────────────────────────
-Stage      │ Feature                    │ Age    │ Status
+Stage      │ Feature                    │ Spec Status │ Age    │ Status
 ─────────────────────────────────────────────────────────────────────────
-SPEC       │ 251230-wishlist            │ 2d     │ ✓ Planning
-           │ 251229-notifications       │ 8d     │ 💤 Dormant
+SPEC       │ 251230-wishlist            │ Draft       │ 2d     │ ✓ Planning
+           │ 251229-notifications       │ Approved    │ 8d     │ 💤 Dormant
 ─────────────────────────────────────────────────────────────────────────
-CODE       │ 251228-payment-retry       │ 1d     │ ✓ In Progress
-           │ 251227-user-profile        │ 4d     │ ⚠️ Slow
+CODE       │ 251228-payment-retry       │ Approved    │ 1d     │ ✓ In Progress
+           │ 251227-user-profile        │ Implemented │ 4d     │ ⚠️ Slow
 ─────────────────────────────────────────────────────────────────────────
-TEST       │ 251226-checkout-flow       │ 1d     │ ✓ Testing
+TEST       │ 251226-checkout-flow       │ Synced      │ 1d     │ ✓ Testing
+           │ 251225-order-refund        │ Implemented │ 1d     │ 🟡 Not Synced
 ─────────────────────────────────────────────────────────────────────────
-PR_LOCAL   │ 251225-inventory           │ 2d     │ ⚠️ Stale (not pushed)
+PR_LOCAL   │ 251224-inventory           │ Synced      │ 2d     │ ⚠️ Stale (not pushed)
 ─────────────────────────────────────────────────────────────────────────
-PR_PUSHED  │ 251224-order-history       │ 1d     │ ✓ Awaiting Review
+PR_PUSHED  │ 251223-order-history       │ Synced      │ 1d     │ ✓ Awaiting Review
 ─────────────────────────────────────────────────────────────────────────
-CI         │ 251223-discount-codes      │ 2d     │ 🔴 Blocked (CI failing)
+CI         │ 251222-discount-codes      │ Synced      │ 2d     │ 🔴 Blocked (CI failing)
 ─────────────────────────────────────────────────────────────────────────
-REVIEW     │ 251222-guest-checkout      │ 0d     │ ✓ Ready to Merge
+REVIEW     │ 251221-guest-checkout      │ Synced      │ 0d     │ ✓ Ready to Merge
 ─────────────────────────────────────────────────────────────────────────
-MERGED     │ 251220-cart-persistence    │ —      │ ✓ Complete
-           │ 251218-product-search      │ —      │ ✓ Complete
+MERGED     │ 251220-cart-persistence    │ Synced      │ —      │ ✓ Complete
+           │ 251218-product-search      │ Synced      │ —      │ ✓ Complete
 ═══════════════════════════════════════════════════════════════════════
 
-ALERTS (3)
+SPEC STATUS LEGEND
 ─────────────────────────────────────────────────────────────────────────
-⚠️  251229-notifications    │ Dormant 8 days       │ /asdf:code or archive
-⚠️  251225-inventory        │ PR not pushed 2 days │ /asdf:pr --push
-🔴 251223-discount-codes   │ CI failing 2 days    │ Fix failing tests
+Draft → Review → Approved → Implemented → Synced
+                            ↑               ↑
+                         /asdf:code      /asdf:sync
+
+ALERTS (4)
+─────────────────────────────────────────────────────────────────────────
+🟡 251225-order-refund     │ Implemented not synced │ /asdf:sync before tests
+⚠️  251229-notifications    │ Dormant 8 days         │ /asdf:code or archive
+⚠️  251224-inventory        │ PR not pushed 2 days   │ /asdf:pr --push
+🔴 251222-discount-codes   │ CI failing 2 days      │ Fix failing tests
 ─────────────────────────────────────────────────────────────────────────
 
 RECOMMENDATIONS
 ─────────────────────────────────────────────────────────────────────────
-1. Merge approved PR: /asdf:merge guest-checkout
-2. Push stale PR: /asdf:pr inventory --push
-3. Fix CI: Check 251223-discount-codes test failures
-4. Archive or start: 251229-notifications (dormant 8d)
+1. Sync before testing: /asdf:sync order-refund (then /asdf:test)
+2. Merge approved PR: /asdf:merge guest-checkout
+3. Push stale PR: /asdf:pr inventory --push
+4. Fix CI: Check 251222-discount-codes test failures
+5. Archive or start: 251229-notifications (dormant 8d)
 ─────────────────────────────────────────────────────────────────────────
 
 Last scan: 2025-12-26 14:30:00
@@ -163,6 +180,7 @@ Last scan: 2025-12-26 14:30:00
 | Icon | Meaning |
 |------|---------|
 | ✓ | On track |
+| 🟡 | Not synced — run `/asdf:sync` |
 | ⚠️ | Stale — needs attention |
 | 🔴 | Blocked — action required |
 | 💤 | Dormant — no activity |

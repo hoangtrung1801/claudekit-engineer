@@ -1,10 +1,20 @@
 # ASDF (Astraler Spec-Driven Framework)
 
-> **Version**: 4.0.0
-> **Last Updated**: 241224
+> **Version**: 4.1.0
+> **Toolkit Version**: 2.1.0
+> **Last Updated**: 251227
 > **Status**: Production Ready
 
-### v4.0 Features (New)
+### v4.1 Features (New)
+- **6-State Spec Lifecycle** — Draft → Review → Approved → Implemented → Synced → Completed
+- **Auto Status Transitions** — `/asdf:code` → Implemented, `/asdf:sync` → Synced, `/asdf:merge` → Completed
+- **PR Push Default** — `/asdf:pr` now pushes to GitHub by default (use `--local` to skip)
+- **Sync Impact Analysis** — `/asdf:sync` detects and updates related docs (01-system-core, 02-domains)
+- **Test Workflow Order** — `/asdf:test` warns if spec not synced (correct order: Code → Sync → Test)
+- **Guardian Spec Status** — Shows spec status column with "Not synced" alerts
+- **Playwright MCP** — E2E tests can run on Playwright MCP
+
+### v4.0 Features
 - **Help System** — `/asdf` shows grouped command reference, all commands have `--help`
 - **Component Update** — `/asdf:update [component]` with impact analysis
 - **Progress Reports** — `/asdf:report [feature|all]` for feature/project health
@@ -211,8 +221,9 @@ When starting any task, AI loads context in this sequence:
 **Code Review:**
 | Command | Purpose | Mode |
 |---------|---------|------|
-| `/asdf:pr [feature]` | Create PR package for code review | PR |
-| `/asdf:review [path]` | AI code review from fresh context | REVIEW |
+| `/asdf:pr [feature]` | Create PR package and push to GitHub (use `--local` to skip) | PR |
+| `/asdf:review [path]` | AI code review from fresh context (posts to GitHub PR) | REVIEW |
+| `/asdf:merge [feature]` | Merge approved PR with full cleanup | MERGE |
 
 ### 4.3 Skills
 
@@ -275,7 +286,7 @@ When starting any task, AI loads context in this sequence:
 # [Feature Name]
 
 > **Feature ID**: YYMMDD-feature-name
-> **Status**: Planned | In Progress (%) | Implemented
+> **Status**: Draft | Review | Approved | Implemented | Synced | Completed
 
 ## 1. Overview + Business Value
 ## 2. Requirements
@@ -298,7 +309,43 @@ When starting any task, AI loads context in this sequence:
 
 ---
 
-## 6. Reverse Sync Protocol
+## 6. Spec Status Lifecycle
+
+The 6-state lifecycle tracks feature progress from creation to production:
+
+```
+Draft → Review → Approved → Implemented → Synced → Completed
+  ↑       ↑        ↑            ↑            ↑         ↑
+/asdf:spec manual   manual   /asdf:code  /asdf:sync  /asdf:merge
+```
+
+| Status | Meaning | Transition |
+|--------|---------|------------|
+| Draft | Initial spec creation | Auto on `/asdf:spec` |
+| Review | Awaiting review | Manual after spec refinement |
+| Approved | Ready for implementation | Manual approval |
+| Implemented | Code written | Auto on `/asdf:code` completion |
+| Synced | Spec matches code | Auto on `/asdf:sync` |
+| Completed | Merged to main | Auto on `/asdf:merge` |
+
+### Workflow Order
+
+The correct workflow after implementation is:
+
+```
+/asdf:code → /asdf:sync → /asdf:test → /asdf:pr → /asdf:merge
+     ↓           ↓            ↓            ↓           ↓
+Implemented → Synced → (tests generated) → (PR) → Completed
+```
+
+**Why this order?**
+- Tests should be generated from a **synced** spec that accurately reflects implementation
+- `/asdf:test` warns if spec is not yet synced
+- Guardian shows "Not synced" alerts
+
+---
+
+## 7. Reverse Sync Protocol
 
 ### When to Trigger
 
@@ -325,7 +372,7 @@ When starting any task, AI loads context in this sequence:
 
 ---
 
-## 7. Session Handoff Protocol
+## 8. Session Handoff Protocol
 
 ### Before Ending Session
 
@@ -348,7 +395,7 @@ When starting any task, AI loads context in this sequence:
 
 ---
 
-## 8. Quality Gates
+## 9. Quality Gates
 
 ### Before Implementation
 
@@ -367,7 +414,7 @@ When starting any task, AI loads context in this sequence:
 
 ---
 
-## 9. Workflow Summary
+## 10. Workflow Summary
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -397,7 +444,7 @@ When starting any task, AI loads context in this sequence:
 
 ---
 
-## 10. Case Studies
+## 11. Case Studies
 
 ### Case Study 1: New Project Initialization
 
@@ -872,7 +919,7 @@ AI: **Project Roadmap v1.0**
 
 ---
 
-## 11. Quick Start
+## 12. Quick Start
 
 ### For New Projects
 
@@ -933,7 +980,7 @@ cat astraler-docs/04-operations/implementation-active.md
 
 ---
 
-## 12. Reference Implementation
+## 13. Reference Implementation
 
 A complete sample project demonstrating ASDF patterns is available at:
 

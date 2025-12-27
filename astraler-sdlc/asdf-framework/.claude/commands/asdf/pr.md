@@ -1,14 +1,16 @@
 ---
-description: Create PR package for feature review
-argument-hint: [feature-name] [--push]
+description: Create PR package and push to GitHub (default)
+argument-hint: [feature-name] [--local]
 ---
 
 # Create PR Package
 
 **Feature:** $ARGUMENTS
 
+**Default Behavior:** Push to GitHub and create PR
+
 **Flags:**
-- `--push` — Automatically push to GitHub and create PR after package creation
+- `--local` — Create package locally only, do not push to GitHub
 
 ---
 
@@ -121,7 +123,7 @@ Package: `.pr-review/YYMMDD-$ARGUMENTS/`
 
 ---
 
-### Step 5: Push to Remote (if `--push` flag or prompt)
+### Step 5: Push to Remote (default, skip if `--local` flag)
 
 **Check current branch:**
 ```bash
@@ -178,14 +180,14 @@ Base: main
 3. After approval: `/asdf:merge $ARGUMENTS`
 ```
 
-**If `--push` not specified:**
+**If `--local` flag specified:**
 ```markdown
 **PR Package Ready (Local Only)**
 
 Package created at: `.pr-review/YYMMDD-$ARGUMENTS/`
 
-**To push to GitHub:**
-- Run: `/asdf:pr $ARGUMENTS --push`
+**To push to GitHub later:**
+- Run: `/asdf:pr $ARGUMENTS` (without --local)
 - Or manually:
   1. `git push -u origin [branch]`
   2. `gh pr create --body-file .pr-review/YYMMDD-$ARGUMENTS/summary.md`

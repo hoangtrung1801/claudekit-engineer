@@ -20,7 +20,7 @@ flowchart LR
     end
 
     subgraph PR["3. PR"]
-        F["/asdf:pr --push"] --> G["Push to origin"]
+        F["/asdf:pr"] --> G["Push to origin"]
         G --> H["gh pr create"]
     end
 
@@ -121,17 +121,17 @@ Files:
 
 Lock released: 251226-payment-retry.lock
 
-Next: Create PR with /asdf:pr payment-retry --push
+Next: Create PR with /asdf:pr payment-retry
 ```
 
 ---
 
 ## Phase 3: Create PR and Push
 
-### Option A: Push Immediately
+### Default: Push to GitHub
 
 ```
-You: /asdf:pr payment-retry --push
+You: /asdf:pr payment-retry
 ```
 
 **AI Response:**
@@ -174,10 +174,12 @@ Base: main
 3. After approval: /asdf:merge payment-retry
 ```
 
-### Option B: Local Only (No Push)
+> **Note:** As of v2.1.0, `/asdf:pr` pushes to GitHub by default. Use `--local` flag to create package locally only.
+
+### Option: Local Only (--local flag)
 
 ```
-You: /asdf:pr payment-retry
+You: /asdf:pr payment-retry --local
 ```
 
 **AI Response:**
@@ -188,8 +190,8 @@ Package created at: .pr-review/251226-payment-retry/
 
 **PR Package Ready (Local Only)**
 
-To push to GitHub:
-- Run: /asdf:pr payment-retry --push
+To push to GitHub later:
+- Run: /asdf:pr payment-retry (without --local)
 - Or manually:
   1. git push -u origin feature/payment-retry
   2. gh pr create --body-file .pr-review/251226-payment-retry/summary.md
@@ -598,10 +600,10 @@ Future merges will create merge commits instead of squashing.
 | Command | Purpose |
 |---------|---------|
 | `/asdf:code [spec]` | Auto-creates branch if on main |
-| `/asdf:pr [feature] --push` | Create PR package + push to GitHub |
-| `/asdf:pr [feature]` | Create PR package locally only |
+| `/asdf:pr [feature]` | Create PR package + push to GitHub (default) |
+| `/asdf:pr [feature] --local` | Create PR package locally only |
 | `/asdf:review [path]` | Review + auto-post to GitHub PR |
-| `/asdf:merge [feature]` | Merge PR + full cleanup |
+| `/asdf:merge [feature]` | Merge PR + full cleanup + set status to Completed |
 | `/asdf:config` | View/edit Git settings |
 
 ---
@@ -624,7 +626,7 @@ sequenceDiagram
 
     Note over Dev,Git: Implementation...
 
-    Dev->>ASDF: /asdf:pr --push
+    Dev->>ASDF: /asdf:pr
     ASDF->>Git: git push -u origin
     ASDF->>GH: gh pr create
     GH-->>ASDF: PR #N created
@@ -662,7 +664,8 @@ sequenceDiagram
 
 | Practice | Benefit |
 |----------|---------|
-| Always use `--push` | Single command for PR creation |
+| Use default push | Single command for PR creation (v2.1.0+) |
+| Use `--local` sparingly | Only when you need to review locally first |
 | Review after CI passes | Avoid wasting time on failing PRs |
 | Use squash merge | Clean git history |
 | Configure settings | Team consistency |

@@ -70,10 +70,11 @@ You operate in one of the following modes based on the command received:
    C) Wait for decision — Blocking issue
    ```
 9. Update `implementation-active.md` with progress
-10. Present completion report with AC verification
-11. **Release lock** on completion
+10. **Update spec status to "Implemented"** on completion
+11. Present completion report with AC verification
+12. **Release lock** on completion
 
-**Output:** Working code that matches spec intent
+**Output:** Working code that matches spec intent, spec status updated to "Implemented"
 
 **Mindset:** Disciplined, precise, spec-compliant. YAGNI strictly enforced.
 
@@ -101,10 +102,11 @@ You operate in one of the following modes based on the command received:
 4. On confirm:
    - Update spec with HTML comment audit trail
    - Increment spec version
+   - **Update spec status to "Synced"**
    - Update changelog
 5. Verify spec now reflects implementation
 
-**Output:** Updated specs matching code reality
+**Output:** Updated specs matching code reality, spec status updated to "Synced"
 
 **Mindset:** Honest, thorough, documentation-focused. Truth over convenience.
 
@@ -356,12 +358,15 @@ You operate in one of the following modes based on the command received:
 3. **Calculate stale status (fixed thresholds):**
    | Condition | Threshold | Alert |
    |-----------|-----------|-------|
+   | Implemented not synced | Any | 🟡 NOT SYNCED |
    | PR not pushed | > 1 day | ⚠️ STALE |
    | PR not reviewed | > 2 days | ⚠️ STALE |
    | CI failing | > 1 day | 🔴 BLOCKED |
    | Approved not merged | > 1 day | ⚠️ STALE |
    | Spec without execution | > 7 days | 💤 DORMANT |
    | Coding phase | > 3 days | ⚠️ SLOW |
+
+   **Spec Status Column:** Display spec status (Draft/Review/Approved/Implemented/Synced) in pipeline view.
 
 4. **Calculate health score:**
    ```
@@ -390,7 +395,7 @@ You operate in one of the following modes based on the command received:
 **Purpose:** Display toolkit version and changelog
 
 **Behavior:**
-1. Display current version: **v2.0.0**
+1. Display current version: **v2.1.0**
 2. Display hardcoded changelog (all versions)
 3. No file reads required
 4. No configuration needed
@@ -440,9 +445,25 @@ On confirm: Finalize → Save → Report
 All specs MUST include version header:
 ```markdown
 > **Version:** 1.0.0
-> **Status:** Draft | Review | Approved
+> **Status:** Draft | Review | Approved | Implemented | Synced | Completed
 > **Last Updated:** YYMMDD
 ```
+
+**Spec Status Lifecycle:**
+```
+Draft → Review → Approved → Implemented → Synced → Completed
+  ↑       ↑        ↑            ↑            ↑         ↑
+/asdf:spec  manual   manual   /asdf:code  /asdf:sync  /asdf:merge
+```
+
+| Status | Meaning | Transition |
+|--------|---------|------------|
+| Draft | Being written | Initial creation |
+| Review | Under review | Manual set by team |
+| Approved | Ready to implement | Manual approval |
+| Implemented | Code complete | Auto by `/asdf:code` completion |
+| Synced | Spec matches code | Auto by `/asdf:sync` completion |
+| Completed | Merged to main | Auto by `/asdf:merge` completion |
 
 Version bumps:
 - Patch (1.0.+1): Minor wording changes
@@ -718,6 +739,22 @@ Before marking any task complete:
 | `maintenance` | Audit, cleanup, tech debt tracking (AUDIT, CLEANUP MODE) |
 
 ---
+
+## v2.1.0 Features Summary (Spec Status & Workflow)
+
+| Feature | Purpose | Mode |
+|---------|---------|------|
+| 6-State Status Lifecycle | Draft → Review → Approved → Implemented → Synced → Completed | ALL |
+| Auto Status: Implemented | `/asdf:code` sets status to Implemented | EXECUTE |
+| Auto Status: Synced | `/asdf:sync` sets status to Synced | SYNC |
+| Auto Status: Completed | `/asdf:merge` sets status to Completed | MERGE |
+| PR Default Push | `/asdf:pr` pushes to GitHub by default (use --local to skip) | PR |
+| Sync Impact Analysis | `/asdf:sync` detects and updates related docs (01-system-core, 02-domains) | SYNC |
+| Unsynced Warning | `/asdf:test` warns if spec not synced | TEST |
+| Guardian Spec Status | Show spec status in pipeline view | GUARDIAN |
+| Not Synced Alert | Alert for Implemented but not synced specs | GUARDIAN |
+| Playwright MCP E2E | Run E2E tests directly via Playwright MCP | TEST |
+| Correct Workflow Order | Code → Sync → Test (not Code → Test → Sync) | ALL |
 
 ## v2.0.0 Features Summary (Guardian & Versioning)
 
